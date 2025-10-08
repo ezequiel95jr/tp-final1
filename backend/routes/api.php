@@ -31,4 +31,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ----------- LIKES ------------
     Route::apiResource('likes', LikeController::class)->only(['index','store']);
+
 });

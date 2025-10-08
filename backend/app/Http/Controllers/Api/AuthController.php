@@ -37,28 +37,17 @@ public function register(Request $request)
 }
 
     // Login
-public function login(Request $request)
-{
-    $credentials = $request->only('email', 'password');
-
-    if (!Auth::attempt($credentials)) {
-        return response()->json(['message' => 'Credenciales incorrectas'], 401);
+public function login(Request $request){
+    $user = User::where('email', $request->email)->first();
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return response()->json(['message'=>'Credenciales incorrectas'], 401);
     }
-
-    $user = Auth::user();
     $token = $user->createToken('auth_token')->plainTextToken;
-
-    return response()->json([
-        'token' => $token,
-        'user' => $user
-    ]);
+    return response()->json(['token'=>$token, 'user'=>$user]);
 }
 
-    // Logout (revoca token actual)
-    public function logout(Request $request)
-    {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json(['message' => 'Sesión cerrada']);
-    }
+public function logout(Request $request){
+    $request->user()->currentAccessToken()->delete();
+    return response()->json(['message'=>'Logout exitoso']);
+}
 }

@@ -7,27 +7,36 @@ import PostCard from "../../components/PostCard";
 import { router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import OverflowMenu from "../../components/OverFlowMenu";
+import Button from "../../components/Button";
 
 export default function HomeScreen() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loggingOut, setLoggingOut] = useState(false);
 
-  const fetchPosts = useCallback(async () => {
-    try {
-      const token = await AsyncStorage.getItem("userToken");
-      if (!token) {
-        router.replace("/login"); 
-        return;
-      }
-      const res = await api.get("/posts", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setPosts(res.data?.data ?? res.data ?? []);
-    } catch (error: any) {
-      console.log(error.response?.data || error.message);
-      Alert.alert("Error", "No se pudieron cargar los posts");
-    }
-  }, []);
+  const [page, setPage] = useState(1);
+const [hasMore, setHasMore] = useState(true);
+
+const fetchPosts = useCallback(async (nextPage = 1) => {
+  try {
+    const token = await AsyncStorage.getItem("userToken");
+    if (!token) return;
+    const res = await api.get(`/posts?page=${nextPage}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const data = res.data?.data ?? [];
+    if (nextPage === 1) setPosts(data);
+    else setPosts(prev => [...prev, ...data]);
+
+    // Si Laravel te devuelve meta.pagination.last_page, podés saber si hay más
+    const meta = res.data?.meta ?? res.data;
+    if (meta?.last_page && nextPage >= meta.last_page) setHasMore(false);
+    else setHasMore(true);
+  } catch (error) {
+    console.log("ERROR AL CARGAR POSTS ->", error);
+  }
+}, []);
+
 
   const handleLogout = useCallback(async () => {
     if (loggingOut) return;
@@ -76,6 +85,16 @@ export default function HomeScreen() {
         ListEmptyComponent={<Text>No hay posts aún</Text>}
         contentContainerStyle={{ paddingTop: 8 }}
       />
+      {hasMore && (
+  <Button
+    title="Ver más"
+    onPress={() => {
+      const next = page + 1;
+      setPage(next);
+      fetchPosts(next);
+    }}
+  />
+)}
     </View>
   );
 }

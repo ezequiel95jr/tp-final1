@@ -24,7 +24,7 @@ class Post extends Model
     // Un post puede tener muchos comentarios
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class)->latest();;
     }
 
     // Un post puede tener muchos likes

@@ -8,6 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoginScreen from "./login";
 import HomeScreen from "./home";
 import CreatePostScreen from "./crearpost";
+import RegisterScreen from "./register";
 
 const Stack = createNativeStackNavigator();
 
@@ -23,24 +24,11 @@ export default function App() {
   }, []);
 
   return (
-
-      <Stack.Navigator initialRouteName={initialRoute}>
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ title: "Inicio" }}
-        />
-        <Stack.Screen
-          name="CreatePost"
-          component={CreatePostScreen}
-          options={{ title: "Crear Post" }}
-        />
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="CreatePost" component={CreatePostScreen} />
       </Stack.Navigator>
-
   );
 }

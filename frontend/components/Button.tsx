@@ -7,6 +7,7 @@ type Props = {
   onPress: () => void;
   color?: string;
   textColor?: string;
+  disabled?: boolean;
 };
 
 export default function CustomButton({
@@ -25,6 +26,8 @@ export default function CustomButton({
     </TouchableOpacity>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   button: {

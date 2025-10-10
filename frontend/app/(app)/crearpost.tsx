@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../api"; // tu instancia de Axios
+import api from "../../api";
+import { router } from "expo-router";
 
-export default function CreatePostScreen(props: any) {
-  const { navigation } = props;
+export default function CreatePostScreen() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
@@ -13,11 +13,11 @@ export default function CreatePostScreen(props: any) {
       const token = await AsyncStorage.getItem("userToken");
       if (!token) {
         Alert.alert("Error", "No estás autenticado");
-        navigation.replace("Login");
+        router.replace("/(auth)/login" as any);
         return;
       }
 
-      const res = await api.post(
+      await api.post(
         "/posts",
         { title, content },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -26,7 +26,7 @@ export default function CreatePostScreen(props: any) {
       Alert.alert("Éxito", "Post creado correctamente");
       setTitle("");
       setContent("");
-      navigation.replace("Home"); // vuelve al Home después de crear
+      router.replace("/(app)/home" as any);
     } catch (error: any) {
       console.log(error.response?.data || error.message);
       Alert.alert("Error", "No se pudo crear el post");

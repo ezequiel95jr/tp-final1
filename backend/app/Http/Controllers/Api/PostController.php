@@ -15,16 +15,23 @@ class PostController extends Controller
             'content' => ['required','string'],
         ]);
 
-        // Requiere que la ruta esté bajo auth:sanctum
+        // user() viene del token Sanctum
         $post = $request->user()->posts()->create($data);
+        $post->load('user:id,name');
 
         return response()->json($post, 201);
     }
 
-
-    public function show(string $id)
+    public function index()
     {
-        //
+        // Lista con el usuario (id, name)
+        return Post::with('user:id,name')->latest()->paginate(10);
+    }
+
+    public function show(Post $post)
+    {
+        $post->load('user:id,name');
+        return response()->json($post);
     }
 
     /**

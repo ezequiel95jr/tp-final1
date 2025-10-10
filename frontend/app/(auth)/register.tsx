@@ -1,32 +1,35 @@
-// RegisterScreen.tsx
+// app/(auth)/register.tsx
 import React, { useState } from "react";
 import { View, TextInput, Button, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../api";
+import { useRouter } from "expo-router";
+import api from "../../api";
 
-export default function RegisterScreen({ navigation }: any) {
+export default function RegisterScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
+  const router = useRouter();
 
   const handleRegister = async () => {
     try {
-      const response = await api.post("/register", {
+      const res = await api.post("/register", {
         name,
         email,
         password,
         phone,
       });
 
-      const token = response.data.token;
+      const token = res.data?.token;
+      if (!token) throw new Error("No se recibió token del servidor.");
 
       await AsyncStorage.setItem("userToken", token);
 
-      // Redirige directamente a Home
-      navigation.replace("Home");
+      // Ir directo a Home
+      router.replace("/(app)/home");
     } catch (error: any) {
-      // Si el backend devuelve un error de validación, se muestra
+      console.log("REGISTER ERROR ->", error.response?.data || error.message);
       const message =
         error.response?.data?.message ||
         "No se pudo registrar el usuario. Revisa los campos.";

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, FlatList, StyleSheet, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../api"; // tu instancia de Axios
+import Button from "../components/Button"; 
 
 export default function HomeScreen({ navigation }: any) {
   const [posts, setPosts] = useState([]);

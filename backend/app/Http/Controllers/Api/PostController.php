@@ -8,26 +8,15 @@ use App\Models\Post;
 
 class PostController extends Controller
 {
-
-    public function index()
-    {
-        //
-    }
-
     public function store(Request $request)
     {
-        // Validación
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
+        $data = $request->validate([
+            'title'   => ['required','string','max:255'],
+            'content' => ['required','string'],
         ]);
 
-        // Crear post
-        $post = Post::create([
-            'title' => $request->title,
-            'content' => $request->content,
-            'user_id' => Auth::id(), // Asignamos el post al usuario autenticado
-        ]);
+        // Requiere que la ruta esté bajo auth:sanctum
+        $post = $request->user()->posts()->create($data);
 
         return response()->json($post, 201);
     }

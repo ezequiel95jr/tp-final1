@@ -4,6 +4,7 @@ import { View, Text, ActivityIndicator, StyleSheet, Alert, ScrollView } from "re
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, router } from "expo-router";
 import api from "../../api";
+import Button from "../../components/Button";
 
 export default function DetailPost() {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -23,7 +24,7 @@ export default function DetailPost() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // si el backend devuelve { data: {...} } usar eso, si no, usar res.data
+      
       const payload = res.data?.data ?? res.data;
       setPost(payload);
     } catch (error: any) {
@@ -58,6 +59,7 @@ export default function DetailPost() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+    <Button title="← Volver" onPress={() => router.back()} color="#007bff" />
       <Text style={styles.title}>{post.title}</Text>
       <Text style={styles.author}>Por {post.user?.name ?? "Autor desconocido"}</Text>
       <Text style={styles.content}>{post.content}</Text>
@@ -71,4 +73,5 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, fontWeight: "bold", marginBottom: 10 },
   author: { color: "#555", marginBottom: 20, fontStyle: "italic" },
   content: { fontSize: 16, lineHeight: 22 },
+  
 });

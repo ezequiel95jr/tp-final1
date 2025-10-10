@@ -1,26 +1,24 @@
 // app/(app)/home.tsx
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState } from "react";
 import { View, Text, FlatList, StyleSheet, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
-import Button from "../../components/Button";
 import PostCard from "../../components/PostCard";
 import { router } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
+import OverflowMenu from "../../components/OverFlowMenu";
 
 export default function HomeScreen() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loggingOut, setLoggingOut] = useState(false);
 
-  const ensureAuth = useCallback(async () => {
-    const token = await AsyncStorage.getItem("userToken");
-    if (!token) router.replace("/login");
-    return token;
-  }, []);
-
   const fetchPosts = useCallback(async () => {
     try {
-      const token = await ensureAuth();
-      if (!token) return;
+      const token = await AsyncStorage.getItem("userToken");
+      if (!token) {
+        router.replace("/login"); 
+        return;
+      }
       const res = await api.get("/posts", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -29,7 +27,7 @@ export default function HomeScreen() {
       console.log(error.response?.data || error.message);
       Alert.alert("Error", "No se pudieron cargar los posts");
     }
-  }, [ensureAuth]);
+  }, []);
 
   const handleLogout = useCallback(async () => {
     if (loggingOut) return;
@@ -39,8 +37,8 @@ export default function HomeScreen() {
       if (token) {
         await api.post("/logout", {}, { headers: { Authorization: `Bearer ${token}` } });
       }
-    } catch (e: any) {
-      console.log("LOGOUT ERR ->", e?.response?.data || e?.message);
+    } catch (error: any) {
+      console.log("LOGOUT ERR ->", error?.response?.data || error?.message);
     } finally {
       await AsyncStorage.removeItem("userToken");
       if (api.defaults.headers?.common?.Authorization) {
@@ -51,21 +49,24 @@ export default function HomeScreen() {
     }
   }, [loggingOut]);
 
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+  useFocusEffect(useCallback(() => { fetchPosts(); }, [fetchPosts]));
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Home</Text>
-
-      <Button title="Crear Post" onPress={() => router.push("/crearpost")} color="#007bff" />
-      <Button title="Cerrar sesión" onPress={handleLogout} color="#d9534f" />
+      {/* Header simple */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Home</Text>
+        <OverflowMenu
+          items={[
+            { label: "Crear post", onPress: () => router.push("/crearpost") },
+            { label: "Cerrar sesión", onPress: handleLogout },
+          ]}
+        />
+      </View>
 
       <FlatList
         data={posts}
         keyExtractor={(item: any, idx) => item?.id?.toString?.() ?? String(idx)}
-        style={{ marginTop: 20 }}
         renderItem={({ item }) => (
           <PostCard
             item={item}
@@ -73,12 +74,18 @@ export default function HomeScreen() {
           />
         )}
         ListEmptyComponent={<Text>No hay posts aún</Text>}
+        contentContainerStyle={{ paddingTop: 8 }}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 10 },
+  container: { flex: 1, padding: 16 },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  title: { fontSize: 24, fontWeight: "bold", flex: 1 },
 });

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
 import { router } from "expo-router";
+import Button from "../../components/Button";
 
 export default function CreatePostScreen() {
   const [title, setTitle] = useState("");
@@ -35,6 +36,7 @@ export default function CreatePostScreen() {
 
   return (
     <View style={styles.container}>
+      <Button title="← Volver" onPress={() => router.back()} color="#007bff" />
       <Text style={styles.title}>Crear Post</Text>
 
       <TextInput

@@ -27,12 +27,19 @@ class PostController extends Controller
     public function index()
     {
         // Lista con el usuario (id, name)
-        return Post::with('user:id,name')->latest()->paginate(10);
+        return Post::with('user:id,name')->withCount('likes')->latest()->paginate(10);
     }
 
     public function show(Post $post)
     {
         $post->load('user:id,name');
+        $post->loadCount('likes');
+        
+        $userLiked = false;
+    if (auth()->check()) {
+        $userLiked = $post->likes()->where('user_id', auth()->id())->exists();
+    }
+    $post->setAttribute('user_liked', $userLiked);
         return response()->json($post);
     }
 

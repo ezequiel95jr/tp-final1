@@ -15,6 +15,7 @@ Route::get('/prueba', function () {
 // ----------- AUTH ------------
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/posts', [PostController::class, 'index']); 
 
 // Rutas protegidas por Sanctum (requieren token)
 Route::middleware('auth:sanctum')->group(function () {
@@ -30,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('comments', CommentController::class)->only(['index','store']);
 
     // ----------- LIKES ------------
-    Route::apiResource('likes', LikeController::class)->only(['index','store']);
-
+    //Route::apiResource('likes', LikeController::class)->only(['index','store','show','toggle','count']);
+     Route::post('/likes/toggle', [PostController::class, 'toggleLike']);
+        
 });

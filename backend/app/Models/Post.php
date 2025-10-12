@@ -12,7 +12,9 @@ class Post extends Model
     protected $fillable = [
         'user_id',
         'title',
-        'content'
+        'content',
+        'latitude',
+        'longitude',
     ];
 
     // Un post pertenece a un usuario
@@ -32,4 +34,5 @@ class Post extends Model
     {
         return $this->hasMany(Like::class);
     }
+
 }

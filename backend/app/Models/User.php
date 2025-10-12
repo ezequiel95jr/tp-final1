@@ -39,8 +39,9 @@ class User extends Authenticatable
     }
 
     // Un usuario puede dar muchos likes
-    public function likes()
-    {
-        return $this->hasMany(Like::class);
-    }
+public function likes()
+{
+    return $this->hasMany(Like::class);
+}
+
 }

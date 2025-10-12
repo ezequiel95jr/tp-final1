@@ -1,33 +1,55 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, Button, Alert, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../../api";
 import { router } from "expo-router";
-import Button from "../../components/Button";
+import api from "../api"; // tu archivo de axios
+import * as Location from "expo-location";
 
 export default function CreatePostScreen() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+
+  const getCurrentLocation = async () => {
+    if (Platform.OS === "web") {
+      // Ubicación dummy para web
+      return { coords: { latitude: 0, longitude: 0 } };
+    }
+
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permiso denegado", "No se puede acceder a la ubicación");
+      return { coords: { latitude: 0, longitude: 0 } }; // fallback
+    }
+    const location = await Location.getCurrentPositionAsync({});
+    return location;
+  };
 
   const handleCreatePost = async () => {
     try {
       const token = await AsyncStorage.getItem("userToken");
       if (!token) {
         Alert.alert("Error", "No estás autenticado");
-        router.replace("/(auth)/login" as any);
+        router.replace("/(auth)/login");
         return;
       }
 
+      const location = await getCurrentLocation();
+
       await api.post(
         "/posts",
-        { title, content },
+        {
+          title,
+          content,
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       Alert.alert("Éxito", "Post creado correctamente");
       setTitle("");
       setContent("");
-      router.replace("/(app)/home" as any);
+      router.replace("/(app)/home");
     } catch (error: any) {
       console.log(error.response?.data || error.message);
       Alert.alert("Error", "No se pudo crear el post");
@@ -35,42 +57,20 @@ export default function CreatePostScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Button title="← Volver" onPress={() => router.back()} color="#007bff" />
-      <Text style={styles.title}>Crear Post</Text>
-
+    <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
+      <Text>Título</Text>
       <TextInput
-        style={styles.input}
-        placeholder="Título"
         value={title}
         onChangeText={setTitle}
+        style={{ borderWidth: 1, marginBottom: 10, padding: 5 }}
       />
+      <Text>Contenido</Text>
       <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Contenido"
         value={content}
         onChangeText={setContent}
-        multiline
-        numberOfLines={4}
+        style={{ borderWidth: 1, marginBottom: 10, padding: 5 }}
       />
-
-      <Button title="Crear Post" onPress={handleCreatePost} color="#28a745" />
+      <Button title="Crear Post" onPress={handleCreatePost} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 15,
-  },
-  textArea: {
-    height: 100,
-    textAlignVertical: "top",
-  },
-});

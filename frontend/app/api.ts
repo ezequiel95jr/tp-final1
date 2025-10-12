@@ -11,8 +11,8 @@ if (Platform.OS === "web") {
 } else if (Platform.OS === "android") {
   baseURL = "http://10.0.2.2:8000/api";
 } else {
-  // iOS dispositivo físico: cambiá por tu IP local
-  baseURL = "http://192.168.1.100:8000/api";
+  // CAMIBAR POR LA IP LOCAL 
+  baseURL = "http://192.168.1.47:8000/api";
 }
 
 const api = axios.create({

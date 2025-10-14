@@ -22,10 +22,11 @@ export default function RegisterScreen() {
       });
 
       const token = res.data?.token;
+      const user = res.data?.user;
       if (!token) throw new Error("No se recibió token del servidor.");
 
       await AsyncStorage.setItem("userToken", token);
-
+      await AsyncStorage.setItem("userId", String(user.id));
       // Ir directo a Home
       router.replace("/(app)/home");
     } catch (error: any) {

@@ -14,11 +14,13 @@ export default function LoginScreen() {
     try {
       const res = await api.post("/login", { email, password });
       const token = res.data?.token;
+      const user = res.data?.user;
       if (!token) {
         Alert.alert("Error", "El backend no devolvió token");
         return;
       }
       await AsyncStorage.setItem("userToken", token);
+      await AsyncStorage.setItem("userId", String(user.id));
       router.replace("/home"); // <- sin grupos
     } catch (err: any) {
       console.log("LOGIN ERR ->", err?.response?.data || err?.message);

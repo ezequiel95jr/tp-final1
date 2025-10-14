@@ -25,10 +25,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class)->only(['index','show','store']);
 
     // ----------- POSTS ------------
-    Route::apiResource('posts', PostController::class)->only(['index','show','store']);
+    Route::apiResource('posts', PostController::class)->only(['index','show','store','destroy']);
 
     // ----------- COMMENTS ------------
-    Route::apiResource('comments', CommentController::class)->only(['index','store']);
+    Route::apiResource('comments', CommentController::class)->only(['index','store','destroy']);
 
     // ----------- LIKES ------------
     //Route::apiResource('likes', LikeController::class)->only(['index','store','show','toggle','count']);

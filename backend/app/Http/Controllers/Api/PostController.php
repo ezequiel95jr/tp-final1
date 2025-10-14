@@ -51,13 +51,17 @@ class PostController extends Controller
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+    
+   public function destroy(Post $post)
+{
+    $userId = auth()->id();
+    if ($userId !== $post->user_id) {
+        return response()->json(['message' => 'No autorizado'], 403);
     }
+
+    $post->delete();
+    return response()->json(['message' => 'Post eliminado correctamente']);
+}
     public function toggleLike(Request $request)
 {
     $user = $request->user(); // si usás auth:api o sanctum

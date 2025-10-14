@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { View, Text, ActivityIndicator, StyleSheet, Alert, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet, Alert, ScrollView, TouchableOpacity, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, router } from "expo-router";
 import api from "../../api";
@@ -10,6 +10,25 @@ import CommentInput from "../../components/Comments/CommentInput";
 import CommentList from "../../components/Comments/CommentList";
 import { useComments } from "../../components/Comments/useComments";
 
+function confirmDelete(title: string, message: string): Promise<boolean> {
+  if (Platform.OS === "web") {
+    // confirm() devuelve true/false
+    return Promise.resolve(window.confirm(`${title}\n\n${message}`));
+  }
+  // En móvil mostramos Alert con 2 botones y resolvemos una promesa
+  return new Promise((resolve) => {
+    Alert.alert(
+      title,
+      message,
+      [
+        { text: "Cancelar", style: "cancel", onPress: () => resolve(false) },
+        { text: "Eliminar", style: "destructive", onPress: () => resolve(true) },
+      ],
+      { cancelable: true }
+    );
+  });
+}
+
 export default function DetailPost() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const postId = useMemo(() => Number(id), [id]);
@@ -19,7 +38,7 @@ export default function DetailPost() {
   const [me, setMe] = useState<{ id: number; name?: string } | null>(null);
   const [userLiked, setUserLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
-
+  const [deleting, setDeleting] = useState(false);
   const { comments, loading: loadingComments, load, add, remove } = useComments(postId);
 
   const fetchPost = useCallback(async () => {
@@ -49,8 +68,13 @@ export default function DetailPost() {
   const fetchMe = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem("userToken");
-      if (!token) return;
-      const r = await api.get("/user", { headers: { Authorization: `Bearer ${token}` } });
+      const userId = await AsyncStorage.getItem("userId");
+      if (!token || !userId) return;
+
+
+      const r = await api.get(`/users/${Number(userId)}`, {
+  headers: { Authorization: `Bearer ${token}` },
+});
       setMe(r.data);
     } catch (e) {
       console.log("ME ERR ->", (e as any)?.response?.data || (e as any)?.message);
@@ -79,6 +103,53 @@ export default function DetailPost() {
       Alert.alert("Error", "No se pudo actualizar el like");
     }
   }, [postId]);
+
+  const handleDeletePost = useCallback(async () => {
+  if (!post?.id || !me) return;
+
+  // seguridad extra en el front (el back también valida)
+  if (me.id !== post.user_id) {
+    Alert.alert("Acceso denegado", "Solo el dueño del post puede eliminarlo");
+    return;
+  }
+
+  try {
+    setDeleting(true);
+    const token = await AsyncStorage.getItem("userToken");
+    if (!token) {
+      Alert.alert("Sesión", "Tenés que iniciar sesión para eliminar posts");
+      router.replace("/(auth)/login");
+      return;
+    }
+
+    await api.delete(`/posts/${post.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    Alert.alert("Eliminado", "El post se eliminó correctamente");
+    router.replace("/(app)/home");
+  } catch (err: any) {
+    console.log("DELETE ERR ->", err?.response?.data || err?.message);
+    Alert.alert("Error", "No se pudo eliminar el post");
+  } finally {
+    setDeleting(false);
+  }
+}, [me, post]);
+
+  const handleConfirmDelete = useCallback(() => {
+  Alert.alert(
+    "Eliminar post",
+    "¿Seguro que querés eliminar este post?",
+    [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Eliminar",
+        style: "destructive",
+        onPress: () => handleDeletePost(),
+      },
+    ]
+  );
+}, []);
 
   useEffect(() => {
     if (!postId) return;
@@ -120,6 +191,19 @@ export default function DetailPost() {
             {userLiked ? "❤️" : "🤍"} {likesCount} Like{likesCount !== 1 ? "s" : ""}
           </Text>
         </TouchableOpacity>
+       {me?.id === post?.user_id && (
+  <View style={{ marginVertical: 12 }}>
+    <Button
+      title={deleting ? "Eliminando..." : "Eliminar post"}
+      color="#d9534f"
+      disabled={deleting}
+      onPress={async () => {
+        const ok = await confirmDelete("Eliminar post", "¿Seguro que querés eliminar este post?");
+        if (ok) handleDeletePost();
+      }}
+    />
+  </View>
+)}
       </View>
 
       {/* Comentarios */}
@@ -148,3 +232,4 @@ const styles = StyleSheet.create({
   content: { fontSize: 16, lineHeight: 22 },
   likesContainer: { marginTop: 12, marginBottom: 16 },
 });
+

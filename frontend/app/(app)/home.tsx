@@ -1,6 +1,6 @@
 // app/(app)/home.tsx
 import React, { useCallback, useState } from "react";
-import { View, Text, FlatList, StyleSheet, Alert } from "react-native";
+import { View, Text, FlatList, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
 import PostCard from "../../components/PostCard";
@@ -8,34 +8,35 @@ import { router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import OverflowMenu from "../../components/OverFlowMenu";
 import Button from "../../components/Button";
+import NavBar from "../../components/NavBar";
+
 
 export default function HomeScreen() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const [page, setPage] = useState(1);
-const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
 
-const fetchPosts = useCallback(async (nextPage = 1) => {
-  try {
-    const token = await AsyncStorage.getItem("userToken");
-    if (!token) return;
-    const res = await api.get(`/posts?page=${nextPage}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  const fetchPosts = useCallback(async (nextPage = 1) => {
+    try {
+      const token = await AsyncStorage.getItem("userToken");
+      if (!token) return;
+      const res = await api.get(`/posts?page=${nextPage}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    const data = res.data?.data ?? [];
-    if (nextPage === 1) setPosts(data);
-    else setPosts(prev => [...prev, ...data]);
+      const data = res.data?.data ?? [];
+      if (nextPage === 1) setPosts(data);
+      else setPosts(prev => [...prev, ...data]);
 
-    // Si Laravel te devuelve meta.pagination.last_page, podés saber si hay más
-    const meta = res.data?.meta ?? res.data;
-    if (meta?.last_page && nextPage >= meta.last_page) setHasMore(false);
-    else setHasMore(true);
-  } catch (error) {
-    console.log("ERROR AL CARGAR POSTS ->", error);
-  }
-}, []);
+      const meta = res.data?.meta ?? res.data;
+      if (meta?.last_page && nextPage >= meta.last_page) setHasMore(false);
+      else setHasMore(true);
+    } catch (error) {
+      console.log("ERROR AL CARGAR POSTS ->", error);
+    }
+  }, []);
 
 
   const handleLogout = useCallback(async () => {
@@ -64,10 +65,9 @@ const fetchPosts = useCallback(async (nextPage = 1) => {
     <View style={styles.container}>
       {/* Header simple */}
       <View style={styles.header}>
-        <Text style={styles.title}>Home</Text>
+        <Text style={styles.title}>Feed</Text>
         <OverflowMenu
           items={[
-            { label: "Crear post", onPress: () => router.push("/crearpost") },
             { label: "Cerrar sesión", onPress: handleLogout },
           ]}
         />
@@ -86,15 +86,19 @@ const fetchPosts = useCallback(async (nextPage = 1) => {
         contentContainerStyle={{ paddingTop: 8 }}
       />
       {hasMore && (
-  <Button
-    title="Ver más"
-    onPress={() => {
-      const next = page + 1;
-      setPage(next);
-      fetchPosts(next);
-    }}
-  />
-)}
+        <Button
+          title="Ver más"
+          onPress={() => {
+            const next = page + 1;
+            setPage(next);
+            fetchPosts(next);
+          }}
+        />
+      )}
+      <View style={styles.container}>
+
+        <NavBar />
+      </View>
     </View>
   );
 }

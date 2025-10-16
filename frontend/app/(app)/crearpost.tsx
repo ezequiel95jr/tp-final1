@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, Alert, Platform } from "react-native";
+import { View, Text, TextInput, Button, Alert, Platform, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import api from "../api"; // tu archivo de axios
+import api from "../api"; 
 import * as Location from "expo-location";
+import NavBar from "../../components/NavBar";
 
 export default function CreatePostScreen() {
   const [title, setTitle] = useState("");
@@ -71,6 +72,15 @@ export default function CreatePostScreen() {
         style={{ borderWidth: 1, marginBottom: 10, padding: 5 }}
       />
       <Button title="Crear Post" onPress={handleCreatePost} />
+          <View style={styles.container}>
+      
+            <NavBar />
+          </View>
     </View>
-  );
-}
+    
+    
+  );}
+  const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: "center", alignItems: "center" },
+  title: { fontSize: 22, fontWeight: "bold" },
+});

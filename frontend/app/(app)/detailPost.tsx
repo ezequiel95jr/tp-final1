@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, router } from "expo-router";
 import api from "../../api";
 import Button from "../../components/Button";
+import NavBar from "../../components/NavBar";
 
 // Comentarios
 import CommentInput from "../../components/Comments/CommentInput";
@@ -73,8 +74,8 @@ export default function DetailPost() {
 
 
       const r = await api.get(`/users/${Number(userId)}`, {
-  headers: { Authorization: `Bearer ${token}` },
-});
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setMe(r.data);
     } catch (e) {
       console.log("ME ERR ->", (e as any)?.response?.data || (e as any)?.message);
@@ -105,51 +106,51 @@ export default function DetailPost() {
   }, [postId]);
 
   const handleDeletePost = useCallback(async () => {
-  if (!post?.id || !me) return;
+    if (!post?.id || !me) return;
 
-  // seguridad extra en el front (el back también valida)
-  if (me.id !== post.user_id) {
-    Alert.alert("Acceso denegado", "Solo el dueño del post puede eliminarlo");
-    return;
-  }
-
-  try {
-    setDeleting(true);
-    const token = await AsyncStorage.getItem("userToken");
-    if (!token) {
-      Alert.alert("Sesión", "Tenés que iniciar sesión para eliminar posts");
-      router.replace("/(auth)/login");
+    // seguridad extra en el front (el back también valida)
+    if (me.id !== post.user_id) {
+      Alert.alert("Acceso denegado", "Solo el dueño del post puede eliminarlo");
       return;
     }
 
-    await api.delete(`/posts/${post.id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    try {
+      setDeleting(true);
+      const token = await AsyncStorage.getItem("userToken");
+      if (!token) {
+        Alert.alert("Sesión", "Tenés que iniciar sesión para eliminar posts");
+        router.replace("/(auth)/login");
+        return;
+      }
 
-    Alert.alert("Eliminado", "El post se eliminó correctamente");
-    router.replace("/(app)/home");
-  } catch (err: any) {
-    console.log("DELETE ERR ->", err?.response?.data || err?.message);
-    Alert.alert("Error", "No se pudo eliminar el post");
-  } finally {
-    setDeleting(false);
-  }
-}, [me, post]);
+      await api.delete(`/posts/${post.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      Alert.alert("Eliminado", "El post se eliminó correctamente");
+      router.replace("/(app)/home");
+    } catch (err: any) {
+      console.log("DELETE ERR ->", err?.response?.data || err?.message);
+      Alert.alert("Error", "No se pudo eliminar el post");
+    } finally {
+      setDeleting(false);
+    }
+  }, [me, post]);
 
   const handleConfirmDelete = useCallback(() => {
-  Alert.alert(
-    "Eliminar post",
-    "¿Seguro que querés eliminar este post?",
-    [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Eliminar",
-        style: "destructive",
-        onPress: () => handleDeletePost(),
-      },
-    ]
-  );
-}, []);
+    Alert.alert(
+      "Eliminar post",
+      "¿Seguro que querés eliminar este post?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: () => handleDeletePost(),
+        },
+      ]
+    );
+  }, []);
 
   useEffect(() => {
     if (!postId) return;
@@ -191,19 +192,19 @@ export default function DetailPost() {
             {userLiked ? "❤️" : "🤍"} {likesCount} Like{likesCount !== 1 ? "s" : ""}
           </Text>
         </TouchableOpacity>
-       {me?.id === post?.user_id && (
-  <View style={{ marginVertical: 12 }}>
-    <Button
-      title={deleting ? "Eliminando..." : "Eliminar post"}
-      color="#d9534f"
-      disabled={deleting}
-      onPress={async () => {
-        const ok = await confirmDelete("Eliminar post", "¿Seguro que querés eliminar este post?");
-        if (ok) handleDeletePost();
-      }}
-    />
-  </View>
-)}
+        {me?.id === post?.user_id && (
+          <View style={{ marginVertical: 12 }}>
+            <Button
+              title={deleting ? "Eliminando..." : "Eliminar post"}
+              color="#d9534f"
+              disabled={deleting}
+              onPress={async () => {
+                const ok = await confirmDelete("Eliminar post", "¿Seguro que querés eliminar este post?");
+                if (ok) handleDeletePost();
+              }}
+            />
+          </View>
+        )}
       </View>
 
       {/* Comentarios */}
@@ -218,9 +219,11 @@ export default function DetailPost() {
           onDelete={remove}
         />
       </View>
-
-      <Button title="← Volver" onPress={() => router.back()} color="#007bff" />
+      <View style={styles.container}>
+        <NavBar />
+      </View>
     </ScrollView>
+
   );
 }
 

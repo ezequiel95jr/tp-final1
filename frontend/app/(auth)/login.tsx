@@ -1,6 +1,6 @@
 // app/(auth)/login.tsx
 import React, { useState } from "react";
-import { View, Text, TextInput, Alert } from "react-native";
+import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api";
@@ -27,26 +27,90 @@ export default function LoginScreen() {
       Alert.alert("Error", err?.response?.data?.message || "No se pudo iniciar sesión");
     }
   };
-
   return (
-    <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
-      <Text>Email</Text>
+    <View style={[styles.container]}>
+      <View style={styles.box}>
+      <Text style={styles.inputText}>Email</Text>
       <TextInput
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
-        style={{ borderWidth: 1, marginBottom: 10, padding: 5 }}
+        style={styles.input}
       />
-      <Text>Password</Text>
+      <Text style={styles.inputText}>Password</Text>
       <TextInput
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        style={{ borderWidth: 1, marginBottom: 10, padding: 5 }}
+        style={styles.input}
       />
-      <Button title="Login" onPress={handleLogin} />
-      <Button title="Registrarse" onPress={() => router.push("/register")} />
+      <View style={styles.buttonRow}>
+
+        <TouchableOpacity
+          style={[styles.button, styles.loginButton]}
+          onPress={handleLogin}
+        >
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.registerButton]}
+          onPress={() => router.push("/register")}
+        >
+          <Text style={styles.buttonText}>Registrarse</Text>
+        </TouchableOpacity>
+
+      </View>
+      </View>
     </View>
   );
 }
+const styles = StyleSheet.create({
+  input: {
+  borderWidth: 1, marginBottom: 10, padding: 5, borderRadius: 7, width: 250, backgroundColor: "#fff"
+  },
+  box: {
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#080808ff",
+    backgroundColor: "#cff51344",
+    borderRadius: 20, 
+    padding: 50,
+
+  },
+  container: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+
+  },
+  button: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    minWidth: 120,
+  },
+  loginButton: {
+    backgroundColor: "#2196F3",
+  },
+  registerButton: {
+    backgroundColor: "#4CAF50",
+  },
+  inputText:{
+    color: "#000",
+    textAlign: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+});

@@ -4,6 +4,7 @@ import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router"; // si no usás router acá, podés quitarlo
 
+export const BASE_URL = "http://192.168.1.7:8000/api";
 // ⚠️ Cambiá esto si tu IP de PC cambia
 const LAN_IP = "192.168.1.7";
 
@@ -79,5 +80,13 @@ api.interceptors.response.use(
     return Promise.reject(err);
   }
 );
+
+export async function getMarkers(token: string) {
+  const res = await fetch(`${BASE_URL}/markers`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw await res.json().catch(() => ({}));
+  return res.json();
+}
 
 export default api;

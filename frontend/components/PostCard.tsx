@@ -7,7 +7,7 @@ export type Post = {
   body?: string;
   content?: string;
   image?: string;
-  image_url?: string; // ✅ si el backend ya la genera
+  image_url?: string; 
   category_id?: number;
   state_id?: number;
   created_at?: string;
@@ -31,7 +31,6 @@ export default function PostCard({
 }) {
   const body = item.content ?? item.body ?? '';
 
-  // ✅ Detecta si el backend devuelve una URL completa o solo el nombre
   const imageUrl =
     item.image_url ??
     (item.image?.startsWith('http')

@@ -13,7 +13,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import NavBar from "../../components/NavBar";
-import api from "../api"; // ✅ tu instancia de Axios configurada
+import api from "../../api/api"; 
 
 export default function ProfileScreen() {
   type User = {

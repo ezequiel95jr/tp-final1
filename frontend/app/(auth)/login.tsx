@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../../api";
+import api from "../../api/api";
 import Button from "../../components/Button";
 
 export default function LoginScreen() {

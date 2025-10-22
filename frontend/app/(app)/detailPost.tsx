@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { View, Text, ActivityIndicator, StyleSheet, Alert, ScrollView, TouchableOpacity, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, router } from "expo-router";
-import api from "../../api";
+import api from "../../api/api";
 import Button from "../../components/Button";
 import NavBar from "../../components/NavBar";
 

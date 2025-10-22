@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { View, TextInput, Button, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import api from "../../api";
+import api from "../../api/api";
 
 export default function RegisterScreen() {
   const [name, setName] = useState("");

@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../../api";
+import api from "../../api/api";
 
 export type Comment = {
   id: number;

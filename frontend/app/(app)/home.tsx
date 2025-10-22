@@ -2,7 +2,7 @@
 import React, { useCallback, useState } from "react";
 import { View, Text, FlatList, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../../api";
+import api from "../../api/api";
 import PostCard from "../../components/PostCard";
 import { router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";

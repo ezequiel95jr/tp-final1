@@ -7,6 +7,7 @@ export type Post = {
   body?: string;
   content?: string;
   image?: string;
+  image_url?: string; 
   category_id?: number;
   state_id?: number;
   created_at?: string;
@@ -29,17 +30,26 @@ export default function PostCard({
   onPress: () => void;
 }) {
   const body = item.content ?? item.body ?? '';
-  const imageUrl = item.image
-    ? `http://127.0.0.1:8000/storage/imagenes/${item.image}`
-    : null;
+
+  const imageUrl =
+    item.image_url ??
+    (item.image?.startsWith('http')
+      ? item.image
+      : item.image
+      ? `http://127.0.0.1:8000/storage/imagenes/${item.image}`
+      : null);
 
   return (
     <Pressable onPress={onPress} style={styles.card} accessibilityRole="button">
+      {/* Imagen del post */}
       {imageUrl && (
         <Image
           source={{ uri: imageUrl }}
           style={styles.image}
           resizeMode="cover"
+          onError={(e) =>
+            console.log('Error al cargar la imagen:', e.nativeEvent.error)
+          }
         />
       )}
 
@@ -67,8 +77,8 @@ export default function PostCard({
 
 const styles = StyleSheet.create({
   card: {
-    color: '#f9fafb', // texto claro
-    backgroundColor: '#1e1e1e', // gris oscuro elegante
+    color: '#f9fafb',
+    backgroundColor: '#1e1e1e',
     borderRadius: 12,
     padding: 14,
     marginHorizontal: 16,
@@ -79,28 +89,22 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 6,
-    elevation: 6, // Android shadow
-    transitionDuration: '150ms', // funciona en web
-  },
-  cardHover: {
-    transform: [{ scale: 1.02 }],
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    borderColor: '#3a3a3a',
+    elevation: 6,
   },
   image: {
     width: '100%',
     height: 200,
     borderRadius: 10,
     marginBottom: 10,
+    backgroundColor: '#2a2a2a',
   },
   title: {
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 6,
-    color: '#f9fafb'
+    color: '#f9fafb',
   },
-  body: { color: '#ffffffff' },
+  body: { color: '#fff' },
   metaRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 },
   badgeSpacing: { marginRight: 8, marginBottom: 6 },
   badge: {
@@ -111,5 +115,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#eef2ff',
     color: '#3730a3',
   },
-  date: { marginLeft: 'auto', fontSize: 12, color: '#6b7280' },
+  date: { marginLeft: 'auto', fontSize: 12, color: '#9ca3af' },
 });

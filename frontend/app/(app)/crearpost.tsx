@@ -1,19 +1,9 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  Alert,
-  StyleSheet,
-  Image,
-  ActivityIndicator,
-  TouchableOpacity,
-  ScrollView,
+import {View,Text,TextInput,Button,Alert,StyleSheet,Image,ActivityIndicator,TouchableOpacity,ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import api from "../../api/api";
+import api from "../../api/api"; 
 import * as ImagePicker from "expo-image-picker";
 import NavBar from "../../components/NavBar";
 

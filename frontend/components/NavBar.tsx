@@ -7,9 +7,9 @@ export default function BottomNavBar() {
   const pathname = usePathname();
 
   const tabs = [
-    { name: "Feed", route: "/" },
+    { name: "Feed", route: "/home" },
     { name: "Crear Post", route: "/crearpost" },
-    { name: "Perfil", route: "/perfil" },
+    { name: "Perfil", route: "/ProfileScreen" },
   ];
 
   return (
@@ -37,33 +37,35 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    backgroundColor: "#343434ff",
+    backgroundColor: "#1e1e1e", 
     borderTopWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#2e2e2e",
     paddingVertical: 12,
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    borderRadius: 7,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: -2 },
+    shadowRadius: 6,
+    elevation: 10,
   },
   tab: {
     alignItems: "center",
+    paddingVertical: 6,
+    paddingHorizontal: 10,
   },
   text: {
     fontSize: 14,
-    fontWeight: "bold",
-    color: "#ffffffff",
+    fontWeight: "600",
+    color: "#e0e0e0", 
   },
   activeText: {
-    color: "#afaa4cff",
-    fontWeight: "bold",
+    color: "#cdff4fff", 
   },
   activeTab: {
     borderTopWidth: 2,
-    borderTopColor: "#4CAF50",
+    borderTopColor: "#cdff4fff", 
   },
 });
-
-
-

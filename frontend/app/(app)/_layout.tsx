@@ -8,12 +8,13 @@ export default function AppLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: "#313131ff" }, // fondo en todas las pantallas
+          contentStyle: { backgroundColor: "#313131ff" }, 
         }}
       >
         <Stack.Screen name="home" />
         <Stack.Screen name="crearpost" />
         <Stack.Screen name="detailPost" />
+        <Stack.Screen name="ProfileScreen" />
       </Stack>
     </View>
   );

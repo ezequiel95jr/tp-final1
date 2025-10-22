@@ -1,30 +1,29 @@
 // app/(auth)/login.tsx
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity,Platform } from "react-native";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api/api";
+import Button from "../../components/Button";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  //const TAG = `[${Platform.OS}]`;
+
+/**const testPing = async () => {
+  try {
+    const response = await fetch("http://192.168.1.7:8000/api/prueba");
+    const data = await response.json();
+    console.log("✅ PING FETCH OK ->", data);
+    Alert.alert("Conexión OK", JSON.stringify(data));
+  } catch (error: any) {
+    console.log("❌ PING FETCH ERR ->", error?.message || error);
+    Alert.alert("Error de conexión", error?.message || "No se pudo conectar al backend");
+  }
+};*/
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Completa todos los campos");
-      return;
-    }
-
-    setLoading(true);
     try {
       const payload = { email: email.trim(), password: password.trim() };
 /**console.log(TAG, "LOGIN PAYLOAD", payload);
@@ -39,135 +38,120 @@ try {
       const res = await api.post("/login", { email, password });
       const token = res.data?.token;
       const user = res.data?.user;
-
       if (!token) {
         Alert.alert("Error", "El backend no devolvió token");
         return;
       }
-
       await AsyncStorage.setItem("userToken", token);
       await AsyncStorage.setItem("userId", String(user.id));
-      router.replace("/home");
+      router.replace("/home"); // <- sin grupos
     } catch (err: any) {
       console.log("LOGIN ERR ->", err?.response?.data || err?.message);
       Alert.alert("Error", err?.response?.data?.message || "No se pudo iniciar sesión");
-    } finally {
-      setLoading(false);
     }
   };
+  /**console.log("PING1 axios GET /prueba");
+api.get("/prueba")
+  .then(r => console.log("OK1", r.status, r.data))
+  .catch(e => console.log("ERR1", e.message));
+
+console.log("PING2 fetch GET /prueba");
+fetch("http://192.168.1.7:8000/api/prueba")
+  .then(async r => console.log("OK2", r.status, await r.text()))
+  .catch(e => console.log("ERR2", String(e)));
+
+console.log("PING3 fetch POST /login");
+fetch("http://192.168.1.7:8000/api/login", {
+  method: "POST",
+  headers: { Accept: "application/json", "Content-Type": "application/json" },
+  body: JSON.stringify({ email: "test@test.com", password: "123456" }),
+})
+  .then(async r => console.log("OK3", r.status, await r.text()))
+  .catch(e => console.log("ERR3", String(e)));*/
   return (
-    <View style={styles.container}>
+    <View style={[styles.container]}>
       <View style={styles.box}>
-        <Text style={styles.title}>Iniciar Sesión</Text>
+      <Text style={styles.inputText}>Email</Text>
+      <TextInput
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        style={styles.input}
+      />
+      <Text style={styles.inputText}>Password</Text>
+      <TextInput
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        style={styles.input}
+      />
+      <View style={styles.buttonRow}>
 
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          style={styles.input}
-          placeholder="correo@ejemplo.com"
-          placeholderTextColor="#999"
-        />
+        <TouchableOpacity
+          style={[styles.button, styles.loginButton]}
+          onPress={handleLogin}
+        >
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
 
-        <Text style={styles.label}>Contraseña</Text>
-        <TextInput
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          style={styles.input}
-          placeholder="••••••••"
-          placeholderTextColor="#999"
-        />
+        <TouchableOpacity
+          style={[styles.button, styles.registerButton]}
+          onPress={() => router.push("/register")}
+        >
+          <Text style={styles.buttonText}>Registrarse</Text>
+        </TouchableOpacity>
 
-        {loading ? (
-          <ActivityIndicator size="large" color="#4f9cff" style={{ marginVertical: 10 }} />
-        ) : (
-          <View style={styles.buttonRow}>
-            <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={handleLogin}>
-              <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.button, styles.registerButton]}
-              onPress={() => router.push("/register")}
-            >
-              <Text style={styles.buttonText}>Registrarse</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+      </View>
       </View>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#1c1c1c", // fondo gris oscuro
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 20,
+  input: {
+  borderWidth: 1, marginBottom: 10, padding: 5, borderRadius: 7, width: 250, backgroundColor: "#fff"
   },
   box: {
-    width: "100%",
-    maxWidth: 360,
-    backgroundColor: "#2a2a2a", // gris intermedio
-    borderRadius: 16,
-    padding: 30,
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 6,
-    elevation: 6,
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#080808ff",
+    backgroundColor: "#cff51344",
+    borderRadius: 20, 
+    padding: 50,
+
   },
-  title: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#fff",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  label: {
-    color: "#ccc",
-    fontSize: 15,
-    marginBottom: 6,
-    marginTop: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#3a3a3a",
-    backgroundColor: "#333",
-    borderRadius: 8,
-    color: "#fff",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    fontSize: 15,
+  container: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+
   },
   buttonRow: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     gap: 10,
-    marginTop: 20,
+
   },
   button: {
-    flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 8,
-    alignItems: "center",
+    minWidth: 120,
   },
   loginButton: {
-    backgroundColor: "#4f9cff", // azul sutil de acento
+    backgroundColor: "#2196F3",
   },
   registerButton: {
-    backgroundColor: "#3fa36b", // verde grisáceo
+    backgroundColor: "#4CAF50",
+  },
+  inputText:{
+    color: "#000",
+    textAlign: "center",
   },
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
     textAlign: "center",
-    fontSize: 16,
   },
 });

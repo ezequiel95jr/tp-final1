@@ -27,7 +27,7 @@ class UserController extends Controller
 
     public function show(Request $request)
     {
-        $user = $request->user();
+    $user = \App\Models\User::find($id);
 
         if (!$user) {
             return response()->json(['message' => 'No autenticado'], 401);
@@ -47,25 +47,25 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-public function update(Request $request)
-    {
-        $user = $request->user();
+    public function update(Request $request)
+        {
+            $user = $request->user();
 
-        if (!$user) {
-            return response()->json(['message' => 'No autenticado'], 401);
+            if (!$user) {
+                return response()->json(['message' => 'No autenticado'], 401);
+            }
+
+            $data = $request->validate([
+                'name' => 'required|string|max:255',
+            ]);
+
+            $user->update($data);
+
+            return response()->json([
+                'message' => 'Usuario actualizado correctamente',
+                'user' => $user,
+            ]);
         }
-
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
-        $user->update($data);
-
-        return response()->json([
-            'message' => 'Usuario actualizado correctamente',
-            'user' => $user,
-        ]);
-    }
 
     /**
      * Remove the specified resource from storage.

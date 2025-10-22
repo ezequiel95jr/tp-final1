@@ -62,7 +62,6 @@ export default function HomeScreen() {
     }, [fetchPosts])
   );
 
-  // 🔁 Cargar más posts al llegar al final
   const loadMore = async () => {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
@@ -74,7 +73,6 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header simple */}
       <View style={styles.header}>
         <Text style={styles.title}>Feed</Text>
         <OverflowMenu items={[{ label: "Cerrar sesión", onPress: handleLogout }]} />

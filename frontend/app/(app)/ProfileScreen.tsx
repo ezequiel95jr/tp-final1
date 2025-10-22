@@ -30,7 +30,6 @@ const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // 🔹 1. Cargar datos del usuario autenticado
   const loadUserData = async () => {
     try {
       const token = await AsyncStorage.getItem("userToken");

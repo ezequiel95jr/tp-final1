@@ -214,9 +214,9 @@ export default function DetailPost() {
         )}
       </View>
 
-      {/* Comentarios */}
-      <View style={{ marginTop: 24 }}>
-        <Text style={{ fontWeight: "700", fontSize: 16, marginBottom: 8 }}>Comentarios</Text>
+
+      <View style={styles.commentSection}>
+        <Text style={styles.commentTitle}>Comentarios</Text>
         <CommentInput onSubmit={add} />
         <CommentList
           items={comments}
@@ -226,28 +226,86 @@ export default function DetailPost() {
           onDelete={remove}
         />
       </View>
-      <View style={styles.container}>
-        <NavBar />
-      </View>
+      <NavBar />
     </ScrollView>
 
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, paddingBottom: 40 },
-  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
-  title: { fontSize: 22, fontWeight: "bold", marginTop: 10, marginBottom: 6 },
-  author: { color: "#555", marginBottom: 16, fontStyle: "italic" },
-  content: { fontSize: 16, lineHeight: 22 },
-  likesContainer: { marginTop: 12, marginBottom: 16 },
+  container: {
+    flexGrow: 1,
+    backgroundColor: "#1c1c1c", // fondo principal oscuro
+    padding: 20,
+    paddingBottom: 80,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#1c1c1c",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#ffffff",
+    marginBottom: 8,
+    textAlign: "left",
+  },
+  author: {
+    color: "#aaa",
+    fontSize: 15,
+    marginBottom: 16,
+    fontStyle: "italic",
+  },
+  content: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: "#e0e0e0",
+    marginBottom: 16,
+  },
   postImage: {
     width: "100%",
-    height: 250,
+    height: 260,
     borderRadius: 10,
-    marginVertical: 16,
-    backgroundColor: "#eee", // fondo gris claro mientras carga
+    marginVertical: 14,
+    backgroundColor: "#2a2a2a", // tono gris mientras carga
   },
-
+  likesContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#2a2a2a",
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 20,
+  },
+  likeText: {
+    fontSize: 16,
+    color: "#e0e0e0",
+  },
+  deleteButtonContainer: {
+    marginVertical: 12,
+  },
+  commentSection: {
+    marginTop: 24,
+    backgroundColor: "#2a2a2a",
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  commentTitle: {
+    fontWeight: "700",
+    fontSize: 16,
+    marginBottom: 10,
+    color: "#fff",
+  },
 });
+
 

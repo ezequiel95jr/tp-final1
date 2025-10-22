@@ -9,7 +9,7 @@ export default function BottomNavBar() {
   const tabs = [
     { name: "Feed", route: "/" },
     { name: "Crear Post", route: "/crearpost" },
-    { name: "Perfil", route: "/perfil" },
+    { name: "Perfil", route: "/ProfileScreen" },
   ];
 
   return (

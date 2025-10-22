@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { View, Text, ActivityIndicator, StyleSheet, Alert, ScrollView, TouchableOpacity, Platform } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet, Alert, Image, ScrollView, TouchableOpacity, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, router } from "expo-router";
 import api from "../../api";
 import Button from "../../components/Button";
 import NavBar from "../../components/NavBar";
-
 // Comentarios
 import CommentInput from "../../components/Comments/CommentInput";
 import CommentList from "../../components/Comments/CommentList";
@@ -184,6 +183,14 @@ export default function DetailPost() {
       <Text style={styles.title}>{post.title}</Text>
       <Text style={styles.author}>Por {post.user?.name ?? "Autor desconocido"}</Text>
       <Text style={styles.content}>{post.content}</Text>
+      {post.image && (
+        <Image
+          source={{ uri: post.image_url ?? post.image }}
+          style={styles.postImage}
+          resizeMode="cover"
+        />
+
+      )}
 
       {/* Likes */}
       <View style={styles.likesContainer}>
@@ -234,5 +241,13 @@ const styles = StyleSheet.create({
   author: { color: "#555", marginBottom: 16, fontStyle: "italic" },
   content: { fontSize: 16, lineHeight: 22 },
   likesContainer: { marginTop: 12, marginBottom: 16 },
+  postImage: {
+    width: "100%",
+    height: 250,
+    borderRadius: 10,
+    marginVertical: 16,
+    backgroundColor: "#eee", // fondo gris claro mientras carga
+  },
+
 });
 

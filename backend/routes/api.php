@@ -7,6 +7,9 @@ use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\ImageController;
+use App\Http\Controllers\Api\MarkerController;
+use App\Http\Controllers\Api\MapsController;
+
 
 // Ruta de prueba
 Route::get('/prueba', function () {
@@ -37,5 +40,16 @@ Route::middleware('auth:sanctum')->group(function () {
      Route::post('/upload', [ImageController::class, 'upload']);
          Route::get('/user', [UserController::class, 'show']);
     Route::put('/user', [UserController::class, 'update']);
+
+    //------------------ Maps ------------------
+    Route::apiResource('markers', MarkerController::class)
+        ->only(['index','store','update','destroy']);
+
+    Route::prefix('maps')->controller(MapsController::class)->group(function () {
+        Route::post('geocode', 'geocode');
+        Route::post('reverse-geocode', 'reverseGeocode');
+        Route::get('places/autocomplete', 'placesAutocomplete');
+        Route::get('directions', 'directions');
+    });
         
 });

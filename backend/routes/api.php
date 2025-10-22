@@ -35,5 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
      Route::post('/likes/toggle', [PostController::class, 'toggleLike']);
 
      Route::post('/upload', [ImageController::class, 'upload']);
+         Route::get('/user', [UserController::class, 'show']);
+    Route::put('/user', [UserController::class, 'update']);
         
 });

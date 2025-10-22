@@ -1,22 +1,20 @@
 // app/(app)/home.tsx
 import React, { useCallback, useState } from "react";
-import { View, Text, FlatList, StyleSheet, Alert, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, StyleSheet, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../api/api";
 import PostCard from "../../components/PostCard";
 import { router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import OverflowMenu from "../../components/OverFlowMenu";
-import Button from "../../components/Button";
 import NavBar from "../../components/NavBar";
-
 
 export default function HomeScreen() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loggingOut, setLoggingOut] = useState(false);
-
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const fetchPosts = useCallback(async (nextPage = 1) => {
     try {
@@ -38,7 +36,6 @@ export default function HomeScreen() {
     }
   }, []);
 
-
   const handleLogout = useCallback(async () => {
     if (loggingOut) return;
     setLoggingOut(true);
@@ -59,46 +56,46 @@ export default function HomeScreen() {
     }
   }, [loggingOut]);
 
-  useFocusEffect(useCallback(() => { fetchPosts(); }, [fetchPosts]));
+  useFocusEffect(
+    useCallback(() => {
+      fetchPosts();
+    }, [fetchPosts])
+  );
+
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const next = page + 1;
+    await fetchPosts(next);
+    setPage(next);
+    setLoadingMore(false);
+  };
 
   return (
     <View style={styles.container}>
-      {/* Header simple */}
       <View style={styles.header}>
         <Text style={styles.title}>Feed</Text>
-        <OverflowMenu
-          items={[
-            { label: "Cerrar sesión", onPress: handleLogout },
-          ]}
-        />
+        <OverflowMenu items={[{ label: "Cerrar sesión", onPress: handleLogout }]} />
       </View>
 
       <FlatList
         data={posts}
         keyExtractor={(item: any, idx) => item?.id?.toString?.() ?? String(idx)}
         renderItem={({ item }) => (
-          <PostCard
-            item={item}
-            onPress={() => router.push(`/detailPost?id=${item.id}`)}
-          />
+          <PostCard item={item} onPress={() => router.push(`/detailPost?id=${item.id}`)} />
         )}
         ListEmptyComponent={<Text>No hay posts aún</Text>}
         contentContainerStyle={{ paddingTop: 8 }}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5} // 👈 Carga cuando está al 50% del final
+        ListFooterComponent={
+          loadingMore ? (
+            <ActivityIndicator size="small" color="#999" style={{ marginVertical: 10 }} />
+          ) : null
+        }
       />
-      {hasMore && (
-        <Button
-          title="Ver más"
-          onPress={() => {
-            const next = page + 1;
-            setPage(next);
-            fetchPosts(next);
-          }}
-        />
-      )}
-      <View style={styles.container}>
 
-        <NavBar />
-      </View>
+      <NavBar />
     </View>
   );
 }
@@ -110,5 +107,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  title: { fontSize: 24, fontWeight: "bold", flex: 1, color: '#ffffff' },
+  title: { fontSize: 24, fontWeight: "bold", flex: 1, color: "#ffffff" },
 });

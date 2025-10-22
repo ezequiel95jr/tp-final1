@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+
 
 export default function Index() {
   useEffect(() => {
@@ -21,3 +22,5 @@ export default function Index() {
     </View>
   );
 }
+
+

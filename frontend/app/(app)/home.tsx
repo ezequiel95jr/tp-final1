@@ -110,5 +110,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  title: { fontSize: 24, fontWeight: "bold", flex: 1 },
+  title: { fontSize: 24, fontWeight: "bold", flex: 1, color: '#ffffff' },
 });

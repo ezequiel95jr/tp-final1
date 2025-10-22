@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#343434ff",
     borderTopWidth: 1,
     borderColor: "#ddd",
     paddingVertical: 12,
@@ -53,10 +53,10 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#666",
+    color: "#ffffffff",
   },
   activeText: {
-    color: "#4CAF50",
+    color: "#afaa4cff",
     fontWeight: "bold",
   },
   activeTab: {

@@ -15,13 +15,17 @@ class PostController extends Controller
             'content' => ['required','string'],
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
+             'image' => 'nullable|string',
         ]);
 
         // user() viene del token Sanctum
         $post = $request->user()->posts()->create($data);
         $post->load('user:id,name');
 
-        return response()->json($post, 201);
+            return response()->json([
+        'message' => 'Post creado correctamente',
+        'post' => $post
+    ]);
     }
 
     public function index()

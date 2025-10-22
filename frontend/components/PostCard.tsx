@@ -1,11 +1,12 @@
 import React from 'react';
-import { Pressable, View, Text, StyleSheet } from 'react-native';
+import { Pressable, View, Text, StyleSheet, Image } from 'react-native';
 
 export type Post = {
   id: number;
   title: string;
   body?: string;
   content?: string;
+  image?: string;
   category_id?: number;
   state_id?: number;
   created_at?: string;
@@ -28,17 +29,32 @@ export default function PostCard({
   onPress: () => void;
 }) {
   const body = item.content ?? item.body ?? '';
+  const imageUrl = item.image
+    ? `http://127.0.0.1:8000/storage/imagenes/${item.image}`
+    : null;
 
   return (
     <Pressable onPress={onPress} style={styles.card} accessibilityRole="button">
+      {imageUrl && (
+        <Image
+          source={{ uri: imageUrl }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      )}
+
       <Text style={styles.title}>{item.title}</Text>
       {!!body && <Text style={styles.body}>{excerpt(body)}</Text>}
 
       <View style={styles.metaRow}>
         {!!item.category?.name && (
-          <Text style={[styles.badge, styles.badgeSpacing]}>#{item.category.name}</Text>
+          <Text style={[styles.badge, styles.badgeSpacing]}>
+            #{item.category.name}
+          </Text>
         )}
-        {!!item.type && <Text style={[styles.badge, styles.badgeSpacing]}>{item.type}</Text>}
+        {!!item.type && (
+          <Text style={[styles.badge, styles.badgeSpacing]}>{item.type}</Text>
+        )}
         {!!item.created_at && (
           <Text style={[styles.date, styles.badgeSpacing]}>
             {new Date(item.created_at).toLocaleDateString()}
@@ -51,18 +67,42 @@ export default function PostCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
+    color: '#f9fafb', // texto claro
+    backgroundColor: '#1e1e1e', // gris oscuro elegante
     borderRadius: 12,
     padding: 14,
     marginHorizontal: 16,
     marginVertical: 8,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: '#2a2a2a',
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 6,
+    elevation: 6, // Android shadow
+    transitionDuration: '150ms', // funciona en web
   },
-  title: { fontSize: 16, fontWeight: '700', marginBottom: 6 },
-  body: { color: '#374151' },
+  cardHover: {
+    transform: [{ scale: 1.02 }],
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    borderColor: '#3a3a3a',
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 6,
+    color: '#f9fafb'
+  },
+  body: { color: '#ffffffff' },
   metaRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 },
-  badgeSpacing: { marginRight: 8, marginBottom: 6 }, // reemplaza gap
+  badgeSpacing: { marginRight: 8, marginBottom: 6 },
   badge: {
     fontSize: 12,
     paddingHorizontal: 8,

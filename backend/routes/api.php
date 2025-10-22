@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\LikeController;
+use App\Http\Controllers\Api\ImageController;
 
 // Ruta de prueba
 Route::get('/prueba', function () {
@@ -31,7 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('comments', CommentController::class)->only(['index','store','destroy']);
 
     // ----------- LIKES ------------
-    //Route::apiResource('likes', LikeController::class)->only(['index','store','show','toggle','count']);
      Route::post('/likes/toggle', [PostController::class, 'toggleLike']);
+
+     Route::post('/upload', [ImageController::class, 'upload']);
         
 });

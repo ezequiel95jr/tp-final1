@@ -15,6 +15,7 @@ class Post extends Model
         'content',
         'latitude',
         'longitude',
+        'image',
     ];
 
     // Un post pertenece a un usuario
@@ -22,6 +23,13 @@ class Post extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // un post tiene muchas imagenes
+    public function imagenes()
+{
+    return $this->hasMany(Imagen::class, 'id_post');
+}
+
 
     // Un post puede tener muchos comentarios
     public function comments()

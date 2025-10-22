@@ -24,29 +24,48 @@ class UserController extends Controller
         //
     }
 
-    public function show(string $id)
-{
+
+    public function show(Request $request)
+    {
     $user = \App\Models\User::find($id);
 
-    if (!$user) {
-        return response()->json(['message' => 'Usuario no encontrado'], 404);
-    }
+        if (!$user) {
+            return response()->json(['message' => 'No autenticado'], 401);
+        }
 
-    
-    return response()->json([
-        'id' => $user->id,
-        'name' => $user->name,
-        'email' => $user->email,
-    ]);
-}
+        // Podés agregar más relaciones si querés (por ejemplo 'posts')
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'created_at' => $user->created_at,
+            'posts_count' => $user->posts()->count() ?? 0,
+            'avatar' => $user->avatar ?? null,
+        ]);
+    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    public function update(Request $request)
+        {
+            $user = $request->user();
+
+            if (!$user) {
+                return response()->json(['message' => 'No autenticado'], 401);
+            }
+
+            $data = $request->validate([
+                'name' => 'required|string|max:255',
+            ]);
+
+            $user->update($data);
+
+            return response()->json([
+                'message' => 'Usuario actualizado correctamente',
+                'user' => $user,
+            ]);
+        }
 
     /**
      * Remove the specified resource from storage.

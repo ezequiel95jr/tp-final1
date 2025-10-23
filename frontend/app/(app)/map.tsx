@@ -1,7 +1,8 @@
 import { Platform } from "react-native";
-import NativeMap from "./map.native";
-import WebMap from "./map.web";
+import MapWeb from "../../components/maps/map.web";
+import MapNative from "../../components/maps/map.native";
 
-export default function MapRoute() {
-  return Platform.OS === "web" ? <WebMap /> : <NativeMap />;
+export default function Map() {
+  const MapComponent = Platform.OS === "web" ? MapWeb : MapNative;
+  return <MapComponent />;
 }

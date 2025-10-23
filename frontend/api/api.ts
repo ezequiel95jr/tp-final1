@@ -81,12 +81,10 @@ api.interceptors.response.use(
   }
 );
 
-export async function getMarkers(token: string) {
-  const res = await fetch(`${BASE_URL}/markers`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw await res.json().catch(() => ({}));
-  return res.json();
-}
+export const getMarkers = async () => {
+  const response = await fetch("http://192.168.1.7:8000/api/markers");
+  return await response.json();
+};
+
 
 export default api;

@@ -20,7 +20,8 @@ Route::get('/prueba', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/posts', [PostController::class, 'index']); 
-
+Route::apiResource('markers', MarkerController::class)
+        ->only(['index','store','update','destroy']);
 // Rutas protegidas por Sanctum (requieren token)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -42,14 +43,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user', [UserController::class, 'update']);
 
     //------------------ Maps ------------------
-    Route::apiResource('markers', MarkerController::class)
-        ->only(['index','store','update','destroy']);
+    
 
-    Route::prefix('maps')->controller(MapsController::class)->group(function () {
-        Route::post('geocode', 'geocode');
-        Route::post('reverse-geocode', 'reverseGeocode');
-        Route::get('places/autocomplete', 'placesAutocomplete');
-        Route::get('directions', 'directions');
-    });
+    Route::get('/maps/geocode', [MapsController::class, 'geocode']);
+
         
 });

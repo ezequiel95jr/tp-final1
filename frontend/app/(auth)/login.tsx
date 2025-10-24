@@ -26,6 +26,16 @@ export default function LoginScreen() {
 
     setLoading(true);
     try {
+      const payload = { email: email.trim(), password: password.trim() };
+/**console.log(TAG, "LOGIN PAYLOAD", payload);
+
+try {
+  const r = await api.post("/login", payload);
+  console.log(TAG, "LOGIN RES", r.status, r.data);
+} catch (e: any) {
+  console.log(TAG, "LOGIN ERR", e?.message, e?.response?.status, e?.config?.baseURL + (e?.config?.url ?? ""));
+}*/
+
       const res = await api.post("/login", { email, password });
       const token = res.data?.token;
       const user = res.data?.user;
@@ -45,7 +55,6 @@ export default function LoginScreen() {
       setLoading(false);
     }
   };
-
   return (
     <View style={styles.container}>
       <View style={styles.box}>

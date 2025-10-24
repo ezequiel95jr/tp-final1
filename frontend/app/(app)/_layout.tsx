@@ -16,6 +16,7 @@ export default function AppLayout() {
         <Stack.Screen name="crearpost" />
         <Stack.Screen name="detailPost" />
         <Stack.Screen name="ProfileScreen" />
+        <Stack.Screen name="map" />
       </Stack>
     </View>
   );

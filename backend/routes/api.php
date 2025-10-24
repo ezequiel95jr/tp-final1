@@ -7,6 +7,9 @@ use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\ImageController;
+use App\Http\Controllers\Api\MarkerController;
+use App\Http\Controllers\Api\MapsController;
+
 
 // Ruta de prueba
 Route::get('/prueba', function () {
@@ -17,7 +20,8 @@ Route::get('/prueba', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/posts', [PostController::class, 'index']); 
-
+Route::apiResource('markers', MarkerController::class)
+        ->only(['index','store','update','destroy']);
 // Rutas protegidas por Sanctum (requieren token)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -37,5 +41,11 @@ Route::middleware('auth:sanctum')->group(function () {
      Route::post('/upload', [ImageController::class, 'upload']);
          Route::get('/user', [UserController::class, 'show']);
     Route::put('/user', [UserController::class, 'update']);
+
+    //------------------ Maps ------------------
+    
+
+    Route::get('/maps/geocode', [MapsController::class, 'geocode']);
+
         
 });

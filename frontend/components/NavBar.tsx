@@ -10,6 +10,7 @@ export default function BottomNavBar() {
     { name: "Feed", route: "/home" },
     { name: "Crear Post", route: "/crearpost" },
     { name: "Perfil", route: "/ProfileScreen" },
+    {name: "Mapa", route: "/map" }
   ];
 
   return (

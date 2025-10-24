@@ -179,19 +179,21 @@ export default function DetailPost() {
   }
 
   return (
+    
     <ScrollView contentContainerStyle={styles.container}>
+      
       <Text style={styles.title}>{post.title}</Text>
       <Text style={styles.author}>Por {post.user?.name ?? "Autor desconocido"}</Text>
-      <Text style={styles.content}>{post.content}</Text>
       {post.image && (
         <Image
-          source={{ uri: post.image_url ?? post.image }}
-          style={styles.postImage}
-          resizeMode="cover"
+        source={{ uri: post.image_url ?? post.image }}
+        style={styles.postImage}
+        resizeMode="cover"
         />
-
+        
       )}
 
+      <Text style={styles.content}>{post.content}</Text>
       {/* Likes */}
       <View style={styles.likesContainer}>
         <TouchableOpacity onPress={toggleLike}>

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import {View,Text,TextInput,Button,Alert,StyleSheet,Image,ActivityIndicator,TouchableOpacity,ScrollView,
-} from "react-native";
+import { View, Text, TextInput, Button, Alert, StyleSheet, Image, ActivityIndicator, TouchableOpacity, ScrollView, } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import api from "../../api/api"; 
+import * as Location from "expo-location";
+import api from "../../api/api";
 import * as ImagePicker from "expo-image-picker";
 import NavBar from "../../components/NavBar";
 
@@ -12,6 +12,9 @@ export default function CreatePostScreen() {
   const [content, setContent] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
+
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -42,7 +45,6 @@ export default function CreatePostScreen() {
         return;
       }
 
-      // Subida de imagen
       const formData = new FormData();
       const response = await fetch(image);
       const blob = await response.blob();
@@ -59,7 +61,14 @@ export default function CreatePostScreen() {
 
       await api.post(
         "/posts",
-        { title, content, image: imageUrl },
+        {
+          title,
+          content,
+          image: imageUrl,
+          latitude: location?.lat,
+          longitude: location?.lng,
+          address: address ?? null,
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -75,6 +84,36 @@ export default function CreatePostScreen() {
       setUploading(false);
     }
   };
+  const handleSetLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permiso denegado", "No se pudo acceder a la ubicación.");
+        return;
+      }
+
+      const loc = await Location.getCurrentPositionAsync({});
+      const coords = {
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+      };
+      setLocation({ lat: coords.latitude, lng: coords.longitude });
+
+      // 🔍 Obtener dirección legible (opcional)
+      const geocode = await Location.reverseGeocodeAsync(coords);
+      if (geocode.length > 0) {
+        const place = geocode[0];
+        const readableAddress = `${place.street ?? ""} ${place.name ?? ""}, ${place.city ?? ""}, ${place.region ?? ""}`;
+        setAddress(readableAddress);
+      }
+
+      Alert.alert("Ubicación establecida ✅", "Se ha guardado tu ubicación actual.");
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "No se pudo obtener la ubicación actual.");
+    }
+  };
+
 
   return (
     <View style={styles.container}>
@@ -99,6 +138,15 @@ export default function CreatePostScreen() {
           placeholderTextColor="#aaa"
           multiline
         />
+        <TouchableOpacity onPress={handleSetLocation} style={styles.button}>
+          <Text style={styles.buttonText}>Usar mi ubicación actual 📍</Text>
+        </TouchableOpacity>
+
+        {location && (
+          <Text style={{ color: "#9f9", marginTop: 8 }}>
+            Ubicación guardada: {address ?? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`}
+          </Text>
+        )}
 
         <TouchableOpacity onPress={pickImage} style={styles.button}>
           <Text style={styles.buttonText}>Seleccionar imagen</Text>
@@ -129,7 +177,7 @@ export default function CreatePostScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1c1c1c", // fondo oscuro
+    backgroundColor: "#1c1c1c",
   },
   contentContainer: {
     padding: 20,

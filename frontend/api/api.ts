@@ -6,7 +6,7 @@ import { router } from "expo-router"; // si no usás router acá, podés quitarl
 
 export const BASE_URL = "http://192.168.1.7:8000/api";
 // ⚠️ Cambiá esto si tu IP de PC cambia
-const LAN_IP = "192.168.1.7";
+const LAN_IP = "192.168.1.47";
 
 // BaseURL por plataforma: web usa localhost; móvil (Expo Go) usa tu IP LAN
 const baseURL = Platform.select({
@@ -14,7 +14,7 @@ const baseURL = Platform.select({
   default: `http://${LAN_IP}:8000/api`,
 }) as string;
 
-console.log(`[${Platform.OS}] BASE`, baseURL);
+//console.log(`[${Platform.OS}] BASE`, baseURL);
 
 const api = axios.create({
   baseURL,
@@ -25,7 +25,6 @@ const api = axios.create({
   },
 });
 
-// --- Paracaídas: si alguien intenta usar 10.0.2.2, lo forzamos a tu LAN ---
 api.interceptors.request.use((config) => {
   const bad =
     (config.baseURL && config.baseURL.includes("10.0.2.2")) ||
@@ -57,7 +56,6 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-// Manejo de errores (útil para debug y 401)
 api.interceptors.response.use(
   (res) => res,
   async (err: AxiosError<any>) => {
@@ -71,7 +69,6 @@ api.interceptors.response.use(
     });
 
     if (err.response?.status === 401) {
-      // Opcional: limpiar sesión y mandar a login
       await AsyncStorage.removeItem("userToken");
       try {
         router.replace("/(auth)/login");
@@ -82,7 +79,7 @@ api.interceptors.response.use(
 );
 
 export const getMarkers = async () => {
-  const response = await fetch("http://192.168.1.7:8000/api/markers");
+  const response = await fetch("http://192.168.1.47:8000/api/markers");
   return await response.json();
 };
 

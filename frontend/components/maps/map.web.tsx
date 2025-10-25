@@ -1,6 +1,7 @@
 /* global google */
 import { useEffect, useRef } from "react";
 import { getMarkers } from "../../api/api";
+import NavBar from "../NavBar";
 
 export default function MapWeb() {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -9,13 +10,11 @@ export default function MapWeb() {
     const init = async () => {
       const markers = await getMarkers();
 
-      // Mapa inicial (por defecto: Buenos Aires)
       const map = new google.maps.Map(mapRef.current!, {
         center: { lat: -34.6037, lng: -58.3816 },
         zoom: 12,
       });
 
-      // Intentar centrar en la ubicación actual del usuario
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
@@ -36,7 +35,6 @@ export default function MapWeb() {
         );
       }
 
-      // Mostrar los marcadores desde la API
       markers.forEach((m: any) =>
         new google.maps.Marker({
           map,
@@ -46,7 +44,6 @@ export default function MapWeb() {
       );
     };
 
-    // Cargar script de Google Maps solo si no existe
     if (!window.google || !window.google.maps) {
       const script = document.createElement("script");
       script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAtwZ-PkbNa2gbR4apeuxg2cOdQXK9AUqo&libraries=places`;
@@ -59,5 +56,11 @@ export default function MapWeb() {
     }
   }, []);
 
-  return <div ref={mapRef} style={{ width: "100%", height: "100vh" }} />;
+    return (
+    <div style={{ position: "relative", width: "100%", height: "100vh" }}>
+      <div ref={mapRef} style={{ width: "100%", height: "100%", zoom:"80%" }} />
+      <NavBar />
+    </div>
+  );
 }
+

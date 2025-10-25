@@ -7,10 +7,10 @@ export default function BottomNavBar() {
   const pathname = usePathname();
 
   const tabs = [
+    {name: "Mapa", route: "/map" },
     { name: "Feed", route: "/home" },
     { name: "Crear Post", route: "/crearpost" },
     { name: "Perfil", route: "/ProfileScreen" },
-    {name: "Mapa", route: "/map" }
   ];
 
   return (

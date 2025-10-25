@@ -1,5 +1,7 @@
 import React from 'react';
 import { Pressable, View, Text, StyleSheet, Image } from 'react-native';
+import MapView, { Marker } from "react-native-maps";
+import { Platform } from "react-native";
 
 export type Post = {
   id: number;
@@ -7,7 +9,9 @@ export type Post = {
   body?: string;
   content?: string;
   image?: string;
-  image_url?: string; 
+  image_url?: string;
+  latitude?: number;
+  longitude?: number;
   category_id?: number;
   state_id?: number;
   created_at?: string;
@@ -36,11 +40,52 @@ export default function PostCard({
     (item.image?.startsWith('http')
       ? item.image
       : item.image
-      ? `http://127.0.0.1:8000/storage/imagenes/${item.image}`
-      : null);
+        ? `http://127.0.0.1:8000/storage/imagenes/${item.image}`
+        : null);
 
   return (
     <Pressable onPress={onPress} style={styles.card} accessibilityRole="button">
+      {Platform.OS === "web" && item.latitude && item.longitude && (
+        <View style={styles.mapContainer}>
+          <iframe
+            src={`https://www.google.com/maps?q=${item.latitude},${item.longitude}&z=15&output=embed`}
+            width="100%"
+            height="100%"
+            style={{ border: 0, borderRadius: 10 }}
+            allowFullScreen
+            loading="lazy"
+          ></iframe>
+        </View>
+      )}
+
+      {item.latitude && item.longitude && (
+        <View style={styles.mapContainer}>
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: Number(item.latitude),
+              longitude: Number(item.longitude),
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            }}
+            scrollEnabled={false}
+            zoomEnabled={false}
+            pitchEnabled={false}
+            rotateEnabled={false}
+            pointerEvents="none" // hace que el mapa no interfiera con el scroll
+          >
+            <Marker
+              coordinate={{
+                latitude: Number(item.latitude),
+                longitude: Number(item.longitude),
+              }}
+              title={item.title}
+              description={item.category?.name ?? ""}
+            />
+          </MapView>
+        </View>
+      )}
+
       {/* Imagen del post */}
       {imageUrl && (
         <Image
@@ -76,6 +121,17 @@ export default function PostCard({
 }
 
 const styles = StyleSheet.create({
+  mapContainer: {
+    width: "100%",
+    height: 150,
+    borderRadius: 10,
+    overflow: "hidden",
+    marginTop: 8,
+  },
+  map: {
+    flex: 1,
+  },
+
   card: {
     color: '#f9fafb',
     backgroundColor: '#1e1e1e',

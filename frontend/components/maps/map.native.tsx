@@ -1,50 +1,96 @@
-import { useEffect, useState, useMemo } from "react";
-import { View, ActivityIndicator, StyleSheet } from "react-native";
-import { WebView } from "react-native-webview";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, ActivityIndicator, Alert } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-import { getMarkers } from "../../api/api";
-
-const GOOGLE_KEY = "AIzaSyAtwZ-PkbNa2gbR4apeuxg2cOdQXK9AUqo";
 
 export default function MapNative() {
-  const [region, setRegion] = useState<{ lat: number; lng: number } | null>(null);
   const [markers, setMarkers] = useState<any[]>([]);
+  const [region, setRegion] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === "granted") {
-        const loc = await Location.getCurrentPositionAsync({});
-        setRegion({ lat: loc.coords.latitude, lng: loc.coords.longitude });
-      } else setRegion({ lat: -34.6037, lng: -58.3816 });
+      try {
+       
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("Error", "No se pudo obtener permiso para la ubicación.");
+          setRegion({
+            latitude: -34.6037,
+            longitude: -58.3816,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          });
+          setLoading(false);
+          return;
+        }
+
+        
+        const location = await Location.getCurrentPositionAsync({});
+        const userRegion = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        };
+        setRegion(userRegion);
+
+        
+        const res = await fetch("http://192.168.1.7:8000/api/markers");
+        const data = await res.json();
+
+        const cleanData = data
+          .filter((m: any) => m.latitude && m.longitude)
+          .map((m: any) => ({
+            ...m,
+            latitude: Number(m.latitude),
+            longitude: Number(m.longitude),
+          }));
+
+        setMarkers(cleanData);
+      } catch (err) {
+        console.log("[API ERROR]", err);
+        Alert.alert("Error", "No se pudo obtener la ubicación o los datos.");
+      } finally {
+        setLoading(false);
+      }
     })();
-    getMarkers().then(setMarkers).catch(console.error);
   }, []);
 
-  const html = useMemo(() => {
-    if (!region) return "";
-    const pts = JSON.stringify(markers);
-    return `
-    <!DOCTYPE html><html><head>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <style>html,body,#map{height:100%;margin:0;padding:0}</style>
-      <script src="https://maps.googleapis.com/maps/api/js?key=${GOOGLE_KEY}&libraries=places"></script>
-    </head><body><div id="map"></div>
-      <script>
-        const center=${JSON.stringify(region)};
-        const map=new google.maps.Map(document.getElementById('map'),{center,zoom:14});
-        const markers=${pts};
-        markers.forEach(m=>{
-          const mk=new google.maps.Marker({map,position:{lat:m.lat,lng:m.lng},title:m.title||'Marcador'});
-        });
-      </script>
-    </body></html>`;
-  }, [region, markers]);
+  if (loading || !region) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
-  if (!region || !html) return <View style={styles.center}><ActivityIndicator/></View>;
-  return <WebView originWhitelist={["*"]} source={{ html }} />;
+  return (
+    <View style={styles.container}>
+      <MapView
+        style={StyleSheet.absoluteFill}
+        initialRegion={region}
+        showsUserLocation={true}
+        showsMyLocationButton={true}
+      >
+        {markers.map((m) => (
+          <Marker
+            key={m.id}
+            coordinate={{ latitude: m.latitude, longitude: m.longitude }}
+            title={m.title || "Sin título"}
+            description={m.description || ""}
+          />
+        ))}
+      </MapView>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  container: { flex: 1 },
+  loading: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

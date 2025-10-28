@@ -4,7 +4,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { View, ActivityIndicator, StyleSheet, Platform } from "react-native";
 import * as NavigationBar from "expo-navigation-bar";
 
+
 export default function Index() {
+
+
   useEffect(() => {
     const checkTokenAndRedirect = async () => {
       try {

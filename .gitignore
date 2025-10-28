@@ -10,6 +10,7 @@ build/
 # Configuraciones locales
 .env
 .DS_Store
+frontend/api/api.ts
 
 # Archivos temporales
 npm-debug.log*
@@ -29,5 +30,4 @@ build/
 .DS_Store
 .vscode/
 
-frontend/api/index.ts
-frontend/api/index.ts
+

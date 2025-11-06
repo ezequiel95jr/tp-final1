@@ -1,6 +1,19 @@
 // app/_layout.tsx
-import { Stack } from "expo-router";
+import { Stack } from "expo-router"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { StyleSheet } from "react-native"
 
 export default function RootLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
+      <Stack screenOptions={{ headerShown: false }} />
+    </SafeAreaView>
+  )
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#000",
+  },
+})

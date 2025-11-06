@@ -136,6 +136,7 @@ export default function DetailPost() {
     }
   }, [me, post]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleConfirmDelete = useCallback(() => {
     Alert.alert(
       "Eliminar post",
@@ -149,7 +150,7 @@ export default function DetailPost() {
         },
       ]
     );
-  }, []);
+  }, [handleDeletePost]);
 
   useEffect(() => {
     if (!postId) return;

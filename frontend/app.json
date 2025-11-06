@@ -1,30 +1,28 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "snapit",
+    "slug": "snapit",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "frontend",
+    "scheme": "snapit",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png",
-        "googleMaps": {
-          "apiKey": "AIzaSyAtwZ-PkbNa2gbR4apeuxg2cOdQXK9AUqo"
-        }
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.frontend"
+  "android": {
+    "adaptiveIcon": {
+      "backgroundColor": "#E6F4FE",
+      "foregroundImage": "./assets/images/android-icon-foreground.png",
+      "backgroundImage": "./assets/images/android-icon-background.png",
+      "monochromeImage": "./assets/images/android-icon-monochrome.png"
     },
+    "permissions": ["ACCESS_FINE_LOCATION"],
+    "edgeToEdgeEnabled": false,
+    "predictiveBackGestureEnabled": false,
+    "package": "com.snapit.frontend"
+  },
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
@@ -43,6 +41,7 @@
           }
         }
       ]
+
     ],
     "experiments": {
       "typedRoutes": true,

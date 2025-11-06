@@ -18,6 +18,7 @@ Route::get('/prueba', function () {
 
 // ----------- AUTH ------------
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/google-login', [AuthController::class, 'googleLogin']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/posts', [PostController::class, 'index']); 
 Route::apiResource('markers', MarkerController::class)

@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import { getMarkers } from "../../api/api";
 import NavBar from "../NavBar";
+import { GOOGLE_MAPS_API_KEY } from "../../constants/config";
 
 export default function MapWeb() {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -46,7 +47,10 @@ export default function MapWeb() {
 
     if (!window.google || !window.google.maps) {
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAtwZ-PkbNa2gbR4apeuxg2cOdQXK9AUqo&libraries=places`;
+      if (!GOOGLE_MAPS_API_KEY) {
+        console.warn("Missing EXPO_PUBLIC_GOOGLE_MAPS_API_KEY env var for Google Maps.");
+      }
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = init;

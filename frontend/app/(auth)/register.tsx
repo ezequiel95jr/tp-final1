@@ -1,14 +1,6 @@
 // app/(auth)/register.tsx
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
+import {View,Text,TextInput,TouchableOpacity,Alert,StyleSheet,ActivityIndicator,} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import api from "../../api/api";
@@ -113,7 +105,7 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1c1c1c", // fondo principal oscuro
+    backgroundColor: "#1c1c1c",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
@@ -121,7 +113,7 @@ const styles = StyleSheet.create({
   box: {
     width: "100%",
     maxWidth: 360,
-    backgroundColor: "#2a2a2a", // gris intermedio
+    backgroundColor: "#2a2a2a", 
     borderRadius: 16,
     padding: 30,
     shadowColor: "#000",

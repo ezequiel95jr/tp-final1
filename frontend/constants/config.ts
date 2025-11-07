@@ -1,6 +1,6 @@
 import { Platform } from "react-native";
 
-const LOCAL_IP = "192.168.1.47"; // 👈 tu IP de Laravel local
+const LOCAL_IP = "192.168.1.6"; // 👈 si cambia, solo se toca acá
 
 // Fallbacks locales o por entorno
 const WEB_BASE =
@@ -27,10 +27,15 @@ export const API_ORIGIN = Platform.select({
 export const GOOGLE_MAPS_API_KEY =
   process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 
-// Utilidad para construir rutas API
+// 🔗 Utilidad para construir rutas API
 export function apiPath(path: string) {
   const base = API_BASE_URL.replace(/\/+$/, "");
   const p = path.startsWith("/") ? path : `/${path}`;
   return `${base}${p}`;
 }
 
+export function buildImageUrl(path: string) {
+  const origin = API_ORIGIN.replace(/\/+$/, "");
+  const cleanPath = path.replace(/^\/+/, "");
+  return `${origin}/${cleanPath}`;
+}

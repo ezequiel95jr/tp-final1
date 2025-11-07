@@ -69,11 +69,26 @@ export default function MapNative() {
   }
 
   return (
-    <View style={styles.container}>
-      
-      <NavBar />
-    </View>
-  );
+  <View style={styles.container}>
+    <MapView
+      style={StyleSheet.absoluteFillObject}
+      initialRegion={region}
+      showsUserLocation
+    >
+      {markers.map((m, i) => (
+        <Marker
+          key={i}
+          coordinate={{ latitude: m.latitude, longitude: m.longitude }}
+          title={m.title || "Marcador"}
+          description={m.description || ""}
+        />
+      ))}
+    </MapView>
+
+    <NavBar />
+  </View>
+);
+
 }
 
 const styles = StyleSheet.create({

@@ -9,6 +9,7 @@ import NavBar from "../../components/NavBar";
 import CommentInput from "../../components/Comments/CommentInput";
 import CommentList from "../../components/Comments/CommentList";
 import { useComments } from "../../components/Comments/useComments";
+import { buildImageUrl } from "../../constants/config";
 
 function confirmDelete(title: string, message: string): Promise<boolean> {
   if (Platform.OS === "web") {
@@ -187,7 +188,7 @@ export default function DetailPost() {
       <Text style={styles.author}>Por {post.user?.name ?? "Autor desconocido"}</Text>
       {post.image && (
         <Image
-        source={{ uri: post.image_url ?? post.image }}
+        source={{ uri: buildImageUrl(post.image) }}
         style={styles.postImage}
         resizeMode="cover"
         />

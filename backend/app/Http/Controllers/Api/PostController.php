@@ -2,41 +2,68 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Marker;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Post;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+
 
 class PostController extends Controller
 {
 public function store(Request $request)
 {
+    $user = $request->user();
+
     $data = $request->validate([
-        'title' => 'required|string|max:255',
-        'content' => 'required|string',
-        'latitude' => 'nullable|numeric',
-        'longitude' => 'nullable|numeric',
-        'address' => 'nullable|string',
-        // 🔹 importante: permitir archivos tipo imagen
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+        'title'      => 'required|string|max:255',
+        'content'    => 'required|string',
+        'image'      => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+        'latitude'   => 'required|numeric',
+        'longitude'  => 'required|numeric',
+        'address'    => 'nullable|string|max:255',
     ]);
 
-    if ($request->hasFile('image')) {
-        $path = $request->file('image')->store('imagenes', 'public');
-        $data['image'] = basename($path); // solo guardamos el nombre del archivo
-    }
+    $post = DB::transaction(function () use ($user, $data, $request) {
 
-    // Crear el post con el usuario autenticado
-    $post = $request->user()->posts()->create($data);
+        
+        $path = $request->file('image')->store('imagenes', 'public');
+        
+        $imageUrl = Storage::url($path);
+
+        
+        $post = Post::create([
+            'user_id' => $user->id,
+            'title'   => $data['title'],
+            'content' => $data['content'],
+            'image'   => $imageUrl,                  
+            'address' => $data['address'] ?? null,
+        ]);
+
+       
+        Marker::create([
+            'post_id'     => $post->id,
+            'user_id'     => $user->id,
+            'latitude'    => $data['latitude'],
+            'longitude'   => $data['longitude'],
+            'title'       => $data['title'],
+            'description' => $data['content'],
+        ]);
+
+        return $post;
+    });
 
     return response()->json([
         'message' => 'Post creado correctamente',
-        'post' => $post,
-    ]);
+        'post'    => $post,
+    ], 201);
 }
+
 
     public function index()
     {
-        // Lista con el usuario (id, name)
+        
         return Post::with('user:id,name')->withCount('likes')->latest()->paginate(10);
     }
 
@@ -74,7 +101,7 @@ public function store(Request $request)
 }
     public function toggleLike(Request $request)
 {
-    $user = $request->user(); // si usás auth:api o sanctum
+    $user = $request->user(); 
     $postId = $request->post_id;
 
     if (!$user) {
@@ -86,7 +113,7 @@ public function store(Request $request)
         return response()->json(['message' => 'Post no encontrado'], 404);
     }
 
-    // Verificamos si el usuario ya dio like
+   
     $like = \App\Models\Like::where('user_id', $user->id)
         ->where('post_id', $postId)
         ->first();

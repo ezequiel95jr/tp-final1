@@ -42,5 +42,9 @@ class Post extends Model
     {
         return $this->hasMany(Like::class);
     }
+    public function marker()
+{
+    return $this->hasOne(Marker::class);
+}
 
 }

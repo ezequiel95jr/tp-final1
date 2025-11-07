@@ -47,7 +47,7 @@ export default function PostCard({
     if (item.image) {
       return item.image.startsWith("http")
         ? item.image
-        : `${API_ORIGIN}/storage/imagenes/${item.image}`;
+        : `${API_ORIGIN}${item.image}`;
     }
 
     return null;

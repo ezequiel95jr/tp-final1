@@ -11,6 +11,8 @@ export default function CreatePostScreen() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState<string | null>(null);
+  const [imageMimeType, setImageMimeType] = useState<string | null>(null);
+  const [imageName, setImageName] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [address, setAddress] = useState<string | null>(null);
@@ -23,7 +25,12 @@ export default function CreatePostScreen() {
       quality: 1,
     });
 
-    if (!result.canceled) setImage(result.assets[0].uri);
+    if (!result.canceled) {
+      const asset = result.assets[0];
+      setImage(asset.uri);
+      setImageMimeType((asset as any).mimeType ?? "image/jpeg");
+      setImageName((asset as any).fileName ?? "photo.jpg");
+    }
   };
 
   const handleCreatePost = async () => {
@@ -46,13 +53,18 @@ export default function CreatePostScreen() {
       }
 
       const formData = new FormData();
-      const response = await fetch(image);
-      const blob = await response.blob();
-      formData.append("image", blob, "photo.jpg");
+      formData.append(
+        "image",
+        {
+          
+          uri: image,
+          name: imageName ?? "photo.jpg",
+          type: imageMimeType ?? "image/jpeg",
+        } as any
+      );
 
       const uploadRes = await api.post("/upload", formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
       });
@@ -65,8 +77,8 @@ export default function CreatePostScreen() {
           title,
           content,
           image: imageUrl,
-          latitude: location?.lat,
-          longitude: location?.lng,
+          latitude: location?.lat ?? null,
+          longitude: location?.lng ?? null,
           address: address ?? null,
         },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -76,6 +88,10 @@ export default function CreatePostScreen() {
       setTitle("");
       setContent("");
       setImage(null);
+      setImageMimeType(null);
+      setImageName(null);
+      setLocation(null);
+      setAddress(null);
       router.replace("/(app)/home");
     } catch (error) {
       console.error(error);

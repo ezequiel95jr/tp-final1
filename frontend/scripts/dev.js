@@ -3,7 +3,7 @@
 // Usage:
 //   npm run dev        # native/web dev tools
 //   npm run dev:web    # web-only
-
+import {baseUrl} from "../api/api.ts";;
 const net = require('net');
 const http = require('http');
 const https = require('https');
@@ -44,7 +44,7 @@ async function findFreePort(from) {
 
     // Determine API base to sanity-check reachability
     const WEB_BASE = process.env.EXPO_PUBLIC_API_WEB_BASE_URL || 'http://127.0.0.1:8000/api';
-    const NATIVE_BASE = process.env.EXPO_PUBLIC_API_NATIVE_BASE_URL || 'http://192.168.1.47:8000/api';
+    const NATIVE_BASE = process.env.EXPO_PUBLIC_API_NATIVE_BASE_URL || baseUrl + '/api';
     const apiBase = webOnly ? WEB_BASE : NATIVE_BASE;
 
     // Lightweight health check (does not block startup)

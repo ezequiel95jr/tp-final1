@@ -1,5 +1,6 @@
 import React from "react";
 import { Pressable, View, Text, StyleSheet, Image, Platform } from "react-native";
+import {baseURL} from "../api/api";
 
 
 export type Post = {
@@ -34,10 +35,6 @@ export default function PostCard({
 }) {
   const body = item.content ?? item.body ?? "";
 
-  const baseURL =
-    Platform.OS === "android"
-      ? "http://192.168.1.47:8000"
-      : "http://127.0.0.1:8000";
 
   const imageUrl =
     item.image_url ??

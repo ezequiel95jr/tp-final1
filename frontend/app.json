@@ -11,18 +11,21 @@
     "ios": {
       "supportsTablet": true
     },
-  "android": {
-    "adaptiveIcon": {
-      "backgroundColor": "#E6F4FE",
-      "foregroundImage": "./assets/images/android-icon-foreground.png",
-      "backgroundImage": "./assets/images/android-icon-background.png",
-      "monochromeImage": "./assets/images/android-icon-monochrome.png"
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png",
+        "usesCleartextTraffic": true
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION"
+      ],
+      "edgeToEdgeEnabled": false,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.snapit.frontend"
     },
-    "permissions": ["ACCESS_FINE_LOCATION"],
-    "edgeToEdgeEnabled": false,
-    "predictiveBackGestureEnabled": false,
-    "package": "com.snapit.frontend"
-  },
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
@@ -40,8 +43,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
-
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

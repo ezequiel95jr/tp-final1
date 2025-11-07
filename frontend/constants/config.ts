@@ -1,20 +1,33 @@
 import { Platform } from "react-native";
-import {baseUrl} from "../api/api";
 
-// Public env vars are embedded at build time by Expo.
-// Provide sensible fallbacks for local development.
-const WEB_BASE = process.env.EXPO_PUBLIC_API_WEB_BASE_URL ?? "http://127.0.0.1:8000/api";
-const NATIVE_BASE = process.env.EXPO_PUBLIC_API_NATIVE_BASE_URL ?? baseUrl + "/api";
+const LOCAL_IP = "192.168.1.47"; // 👈 tu IP de Laravel local
 
-const WEB_ORIGIN = process.env.EXPO_PUBLIC_WEB_ORIGIN ?? "http://127.0.0.1:8000";
-const NATIVE_ORIGIN = process.env.EXPO_PUBLIC_NATIVE_ORIGIN ?? baseUrl;
+// Fallbacks locales o por entorno
+const WEB_BASE =
+  process.env.EXPO_PUBLIC_API_WEB_BASE_URL ?? "http://127.0.0.1:8000/api";
+const NATIVE_BASE =
+  process.env.EXPO_PUBLIC_API_NATIVE_BASE_URL ?? `http://${LOCAL_IP}:8000/api`;
 
-export const API_BASE_URL = Platform.select({ web: WEB_BASE, default: NATIVE_BASE }) as string;
-export const API_ORIGIN = Platform.select({ web: WEB_ORIGIN, default: NATIVE_ORIGIN }) as string;
+const WEB_ORIGIN =
+  process.env.EXPO_PUBLIC_WEB_ORIGIN ?? "http://127.0.0.1:8000";
+const NATIVE_ORIGIN =
+  process.env.EXPO_PUBLIC_NATIVE_ORIGIN ?? `http://${LOCAL_IP}:8000`;
 
-export const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+// ✅ Selección según plataforma
+export const API_BASE_URL = Platform.select({
+  web: WEB_BASE,
+  default: NATIVE_BASE,
+}) as string;
 
+export const API_ORIGIN = Platform.select({
+  web: WEB_ORIGIN,
+  default: NATIVE_ORIGIN,
+}) as string;
 
+export const GOOGLE_MAPS_API_KEY =
+  process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+
+// Utilidad para construir rutas API
 export function apiPath(path: string) {
   const base = API_BASE_URL.replace(/\/+$/, "");
   const p = path.startsWith("/") ? path : `/${path}`;

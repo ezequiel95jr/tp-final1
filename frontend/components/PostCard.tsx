@@ -1,7 +1,6 @@
 import React from "react";
-import { Pressable, View, Text, StyleSheet, Image, Platform } from "react-native";
-import {baseURL} from "../api/api";
-
+import { Pressable, View, Text, StyleSheet, Image } from "react-native";
+import { API_ORIGIN } from "../constants/config"; // ✅ Import correcto
 
 export type Post = {
   id: number;
@@ -35,22 +34,27 @@ export default function PostCard({
 }) {
   const body = item.content ?? item.body ?? "";
 
+  // ✅ Corrección: aseguramos que nunca se use 127.0.0.1 o localhost
+  const imageUrl = (() => {
+    if (item.image_url) {
+      let url = item.image_url;
+      url = url
+        .replace("http://127.0.0.1:8000", API_ORIGIN)
+        .replace("http://localhost:8000", API_ORIGIN);
+      return url;
+    }
 
-  const imageUrl =
-    item.image_url ??
-    (item.image
-      ? item.image.startsWith("http")
+    if (item.image) {
+      return item.image.startsWith("http")
         ? item.image
-        : `${baseURL}/storage/imagenes/${item.image}`
-      : null);
+        : `${API_ORIGIN}/storage/imagenes/${item.image}`;
+    }
 
-  const hasLocation = !!item.latitude && !!item.longitude;
-
+    return null;
+  })();
 
   return (
     <Pressable onPress={onPress} style={styles.card} accessibilityRole="button">
-    
-
       {imageUrl && (
         <Image
           source={{ uri: imageUrl }}
@@ -107,14 +111,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: "#2a2a2a",
   },
-  mapContainer: {
-    width: "100%",
-    height: 150,
-    borderRadius: 10,
-    overflow: "hidden",
-    marginTop: 8,
-  },
-  map: { flex: 1 },
   title: {
     fontSize: 16,
     fontWeight: "700",

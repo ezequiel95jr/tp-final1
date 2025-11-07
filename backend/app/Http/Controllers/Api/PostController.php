@@ -8,25 +8,31 @@ use App\Models\Post;
 
 class PostController extends Controller
 {
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'title'   => ['required','string','max:255'],
-            'content' => ['required','string'],
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-             'image' => 'nullable|string',
-        ]);
-
-        // user() viene del token Sanctum
-        $post = $request->user()->posts()->create($data);
-        $post->load('user:id,name');
-
-            return response()->json([
-        'message' => 'Post creado correctamente',
-        'post' => $post
+public function store(Request $request)
+{
+    $data = $request->validate([
+        'title' => 'required|string|max:255',
+        'content' => 'required|string',
+        'latitude' => 'nullable|numeric',
+        'longitude' => 'nullable|numeric',
+        'address' => 'nullable|string',
+        // 🔹 importante: permitir archivos tipo imagen
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
     ]);
+
+    if ($request->hasFile('image')) {
+        $path = $request->file('image')->store('imagenes', 'public');
+        $data['image'] = basename($path); // solo guardamos el nombre del archivo
     }
+
+    // Crear el post con el usuario autenticado
+    $post = $request->user()->posts()->create($data);
+
+    return response()->json([
+        'message' => 'Post creado correctamente',
+        'post' => $post,
+    ]);
+}
 
     public function index()
     {

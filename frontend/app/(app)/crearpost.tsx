@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Alert, StyleSheet, Image, ActivityIndicator, TouchableOpacity, ScrollView, } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Alert,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import * as Location from "expo-location";
@@ -11,28 +21,30 @@ export default function CreatePostScreen() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState<string | null>(null);
-  const [imageMimeType, setImageMimeType] = useState<string | null>(null);
-  const [imageName, setImageName] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
   const [address, setAddress] = useState<string | null>(null);
 
-
+  // ✅ Compatible con Expo SDK 54–55
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
+      });
 
-    if (!result.canceled) {
-      const asset = result.assets[0];
-      setImage(asset.uri);
-      setImageMimeType((asset as any).mimeType ?? "image/jpeg");
-      setImageName((asset as any).fileName ?? "photo.jpg");
+      if (!result.canceled && result.assets?.length > 0) {
+        setImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.log("❌ Error al seleccionar imagen:", error);
     }
   };
 
+  // ✅ Subida directa con imagen incluida
   const handleCreatePost = async () => {
     if (!title || !content) {
       Alert.alert("Completa todos los campos");
@@ -53,53 +65,52 @@ export default function CreatePostScreen() {
       }
 
       const formData = new FormData();
-      formData.append(
-        "image",
-        {
-          
-          uri: image,
-          name: imageName ?? "photo.jpg",
-          type: imageMimeType ?? "image/jpeg",
-        } as any
-      );
+      formData.append("title", title);
+      formData.append("content", content);
 
-      const uploadRes = await api.post("/upload", formData, {
+      if (location?.lat && location?.lng) {
+        formData.append("latitude", String(location.lat));
+        formData.append("longitude", String(location.lng));
+      }
+      if (address) formData.append("address", address);
+
+      const filename = image.split("/").pop();
+      const match = /\.(\w+)$/.exec(filename ?? "");
+      const type = match ? `image/${match[1]}` : `image/jpeg`;
+
+      formData.append("image", {
+        uri: image,
+        name: filename ?? "photo.jpg",
+        type,
+      } as any);
+
+      const res = await api.post("/posts", formData, {
         headers: {
+          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
       });
 
-      const imageUrl = uploadRes.data.url;
-
-      await api.post(
-        "/posts",
-        {
-          title,
-          content,
-          image: imageUrl,
-          latitude: location?.lat ?? null,
-          longitude: location?.lng ?? null,
-          address: address ?? null,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
+      console.log("✅ Post creado correctamente:", res.data);
       Alert.alert("Éxito", "Post creado correctamente 🎉");
+
+      // Reset de estados
       setTitle("");
       setContent("");
       setImage(null);
-      setImageMimeType(null);
-      setImageName(null);
       setLocation(null);
       setAddress(null);
+
       router.replace("/(app)/home");
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.error("❌ Error al crear post:", error.response?.data || error.message);
       Alert.alert("Error", "No se pudo crear el post");
     } finally {
       setUploading(false);
     }
   };
+
+  // 📍 Obtener ubicación actual
   const handleSetLocation = async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -115,11 +126,12 @@ export default function CreatePostScreen() {
       };
       setLocation({ lat: coords.latitude, lng: coords.longitude });
 
-      // 🔍 Obtener dirección legible (opcional)
       const geocode = await Location.reverseGeocodeAsync(coords);
       if (geocode.length > 0) {
         const place = geocode[0];
-        const readableAddress = `${place.street ?? ""} ${place.name ?? ""}, ${place.city ?? ""}, ${place.region ?? ""}`;
+        const readableAddress = `${place.street ?? ""} ${place.name ?? ""}, ${
+          place.city ?? ""
+        }, ${place.region ?? ""}`;
         setAddress(readableAddress);
       }
 
@@ -129,7 +141,6 @@ export default function CreatePostScreen() {
       Alert.alert("Error", "No se pudo obtener la ubicación actual.");
     }
   };
-
 
   return (
     <View style={styles.container}>
@@ -154,13 +165,16 @@ export default function CreatePostScreen() {
           placeholderTextColor="#aaa"
           multiline
         />
+
         <TouchableOpacity onPress={handleSetLocation} style={styles.button}>
           <Text style={styles.buttonText}>Usar mi ubicación actual 📍</Text>
         </TouchableOpacity>
 
         {location && (
           <Text style={{ color: "#9f9", marginTop: 8 }}>
-            Ubicación guardada: {address ?? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`}
+            Ubicación guardada:{" "}
+            {address ??
+              `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`}
           </Text>
         )}
 
@@ -177,9 +191,16 @@ export default function CreatePostScreen() {
         )}
 
         {uploading ? (
-          <ActivityIndicator size="large" color="#4f9cff" style={{ marginVertical: 16 }} />
+          <ActivityIndicator
+            size="large"
+            color="#4f9cff"
+            style={{ marginVertical: 16 }}
+          />
         ) : (
-          <TouchableOpacity onPress={handleCreatePost} style={styles.publishButton}>
+          <TouchableOpacity
+            onPress={handleCreatePost}
+            style={styles.publishButton}
+          >
             <Text style={styles.publishText}>Publicar Post</Text>
           </TouchableOpacity>
         )}

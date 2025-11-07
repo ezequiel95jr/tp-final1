@@ -20,16 +20,16 @@ class MarkerController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
         ]);
 
         $marker = Marker::create([
             'user_id' => Auth::id(),
-            'lat' => $request->lat,
-            'lng' => $request->lng,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
             'title' => $request->title,
             'description' => $request->description,
         ]);
@@ -45,13 +45,13 @@ class MarkerController extends Controller
             ->firstOrFail();
 
         $request->validate([
-            'lat' => 'numeric',
-            'lng' => 'numeric',
+            'latitude' => 'numeric',
+            'longitude' => 'numeric',
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
         ]);
 
-        $marker->update($request->only(['lat', 'lng', 'title', 'description']));
+        $marker->update($request->only(['latitude', 'longitude', 'title', 'description']));
 
         return response()->json($marker);
     }

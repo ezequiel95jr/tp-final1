@@ -22,7 +22,7 @@ export default function CreatePostScreen() {
   const [content, setContent] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(
     null
   );
   const [address, setAddress] = useState<string | null>(null);
@@ -68,9 +68,9 @@ export default function CreatePostScreen() {
       formData.append("title", title);
       formData.append("content", content);
 
-      if (location?.lat && location?.lng) {
-        formData.append("latitude", String(location.lat));
-        formData.append("longitude", String(location.lng));
+      if (location?.latitude && location?.longitude) {
+        formData.append("latitude", String(location.latitude));
+        formData.append("longitude", String(location.longitude));
       }
       if (address) formData.append("address", address);
 
@@ -124,7 +124,7 @@ export default function CreatePostScreen() {
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
       };
-      setLocation({ lat: coords.latitude, lng: coords.longitude });
+      setLocation({ latitude: coords.latitude, longitude: coords.longitude });
 
       const geocode = await Location.reverseGeocodeAsync(coords);
       if (geocode.length > 0) {
@@ -174,7 +174,7 @@ export default function CreatePostScreen() {
           <Text style={{ color: "#9f9", marginTop: 8 }}>
             Ubicación guardada:{" "}
             {address ??
-              `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`}
+              `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`}
           </Text>
         )}
 

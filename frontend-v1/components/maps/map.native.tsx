@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ActivityIndicator, Alert } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import { View, StyleSheet, ActivityIndicator, Alert, Platform } from "react-native";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import NavBar from "../NavBar";
 import * as Location from "expo-location";
 import { apiPath } from "../../constants/config";
@@ -13,10 +13,10 @@ export default function MapNative() {
   useEffect(() => {
     (async () => {
       try {
-        // 🧭 Pedir permiso para usar ubicación
+        // Solicitar permisos de ubicación
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
-          Alert.alert("Error", "No se pudo obtener permiso para la ubicación.");
+          Alert.alert("Error", "Permiso de ubicación denegado.");
           setRegion({
             latitude: -34.6037,
             longitude: -58.3816,
@@ -27,7 +27,7 @@ export default function MapNative() {
           return;
         }
 
-        // 📍 Obtener ubicación actual
+        // Ubicación actual
         const location = await Location.getCurrentPositionAsync({});
         const userRegion = {
           latitude: location.coords.latitude,
@@ -35,13 +35,13 @@ export default function MapNative() {
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         };
+
         setRegion(userRegion);
 
-        // 📡 Obtener marcadores desde tu API
+        // Cargar marcadores desde tu API
         const res = await fetch(apiPath("/markers"));
         const data = await res.json();
 
-        // 🧹 Asegurar que las coordenadas sean numéricas
         const cleanData = data
           .filter((m: any) => m.latitude && m.longitude)
           .map((m: any) => ({
@@ -70,16 +70,36 @@ export default function MapNative() {
 
   return (
     <View style={styles.container}>
-      
-      <NavBar />
+      <MapView
+        provider={PROVIDER_GOOGLE}
+        style={styles.map}
+        region={region}
+        showsUserLocation={true}
+        showsMyLocationButton={true}
+      >
+        {markers.map((m) => (
+          <Marker
+            key={m.id}
+            coordinate={{
+              latitude: m.latitude,
+              longitude: m.longitude,
+            }}
+            title={m.title || "Reporte"}
+            description={m.description || ""}
+          />
+        ))}
+      </MapView>
+
+     <NavBar />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1,  backgroundColor: "#fff" },
+  map: { flex: 1,
+    backgroundColor: "#fff"
+   },
   loading: {
     flex: 1,
     alignItems: "center",

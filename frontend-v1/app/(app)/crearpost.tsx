@@ -16,6 +16,8 @@ import * as Location from "expo-location";
 import api from "../../api/api";
 import * as ImagePicker from "expo-image-picker";
 import NavBar from "../../components/NavBar";
+import { Platform } from "react-native";
+import MapPickerModal from "../../components/MapPickerModal";
 
 export default function CreatePostScreen() {
   const [title, setTitle] = useState("");
@@ -26,8 +28,8 @@ export default function CreatePostScreen() {
     null
   );
   const [address, setAddress] = useState<string | null>(null);
+  const [showPicker, setShowPicker] = useState(false);
 
-  // ✅ Compatible con Expo SDK 54–55
   const pickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -44,18 +46,15 @@ export default function CreatePostScreen() {
     }
   };
 
-  // ✅ Subida directa con imagen incluida
+
   const handleCreatePost = async () => {
     if (!title || !content) {
       Alert.alert("Completa todos los campos");
       return;
     }
-    if (!image) {
-      Alert.alert("Selecciona una imagen antes de publicar");
-      return;
-    }
 
     setUploading(true);
+
     try {
       const token = await AsyncStorage.getItem("userToken");
       if (!token) {
@@ -74,15 +73,17 @@ export default function CreatePostScreen() {
       }
       if (address) formData.append("address", address);
 
-      const filename = image.split("/").pop();
-      const match = /\.(\w+)$/.exec(filename ?? "");
-      const type = match ? `image/${match[1]}` : `image/jpeg`;
+      if (image) {
+        const filename = image.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename ?? "");
+        const type = match ? `image/${match[1]}` : `image/jpeg`;
 
-      formData.append("image", {
-        uri: image,
-        name: filename ?? "photo.jpg",
-        type,
-      } as any);
+        formData.append("image", {
+          uri: image,
+          name: filename ?? "photo.jpg",
+          type,
+        } as any);
+      }
 
       const res = await api.post("/posts", formData, {
         headers: {
@@ -94,7 +95,6 @@ export default function CreatePostScreen() {
       console.log("✅ Post creado correctamente:", res.data);
       Alert.alert("Éxito", "Post creado correctamente 🎉");
 
-      // Reset de estados
       setTitle("");
       setContent("");
       setImage(null);
@@ -110,7 +110,7 @@ export default function CreatePostScreen() {
     }
   };
 
-  // 📍 Obtener ubicación actual
+
   const handleSetLocation = async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -129,9 +129,8 @@ export default function CreatePostScreen() {
       const geocode = await Location.reverseGeocodeAsync(coords);
       if (geocode.length > 0) {
         const place = geocode[0];
-        const readableAddress = `${place.street ?? ""} ${place.name ?? ""}, ${
-          place.city ?? ""
-        }, ${place.region ?? ""}`;
+        const readableAddress = `${place.street ?? ""} ${place.name ?? ""}, ${place.city ?? ""
+          }, ${place.region ?? ""}`;
         setAddress(readableAddress);
       }
 
@@ -139,6 +138,25 @@ export default function CreatePostScreen() {
     } catch (error) {
       console.error(error);
       Alert.alert("Error", "No se pudo obtener la ubicación actual.");
+    }
+  };
+
+  const handleConfirmFromMap = async (coords: { latitude: number; longitude: number }) => {
+    setShowPicker(false);
+    setLocation({ lat: coords.latitude, lng: coords.longitude });
+
+
+    try {
+      const geocode = await Location.reverseGeocodeAsync(coords);
+      if (geocode.length > 0) {
+        const p = geocode[0];
+        const readable = `${p.street ?? ""} ${p.name ?? ""}, ${p.city ?? ""}, ${p.region ?? ""}`.trim();
+        setAddress(readable || null);
+      } else {
+        setAddress(null);
+      }
+    } catch {
+      setAddress(null);
     }
   };
 
@@ -168,6 +186,19 @@ export default function CreatePostScreen() {
 
         <TouchableOpacity onPress={handleSetLocation} style={styles.button}>
           <Text style={styles.buttonText}>Usar mi ubicación actual 📍</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            if (Platform.OS === "web") {
+              Alert.alert("No disponible en Web", "Abrí el selector en Android/iOS.");
+            } else {
+              setShowPicker(true);
+            }
+          }}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Elegir punto en el mapa 🗺️</Text>
         </TouchableOpacity>
 
         {location && (
@@ -205,7 +236,12 @@ export default function CreatePostScreen() {
           </TouchableOpacity>
         )}
       </ScrollView>
-
+      <MapPickerModal
+        visible={showPicker}
+        onClose={() => setShowPicker(false)}
+        onConfirm={handleConfirmFromMap}
+        initial={location ? { latitude: location.lat, longitude: location.lng } : null}
+      />
       <NavBar />
     </View>
   );

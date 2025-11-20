@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "snapit",
-    "slug": "snapit",
+    "name": "frontend-v1",
+    "slug": "frontend-v1",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "snapit",
+    "scheme": "frontendv1",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -16,20 +16,25 @@
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png",
-        "usesCleartextTraffic": true
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "permissions": [
-        "ACCESS_FINE_LOCATION"
-      ],
-      "edgeToEdgeEnabled": false,
+      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.snapit.frontend"
+      "package": "com.ezequiel95jr.frontendv1",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAtwZ-PkbNa2gbR4apeuxg2cOdQXK9AUqo"
+        }
+      }
     },
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+    "permissions": [
+      "ACCESS_COARSE_LOCATION",
+      "ACCESS_FINE_LOCATION"
+    ],
     "plugins": [
       "expo-router",
       [
@@ -49,10 +54,6 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    },
-    "permissions": [
-      "ACCESS_FINE_LOCATION",
-      "ACCESS_COARSE_LOCATION"
-    ]
+    }
   }
 }

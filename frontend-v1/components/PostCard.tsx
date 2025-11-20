@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, View, Text, StyleSheet, Image } from "react-native";
-import { API_ORIGIN } from "../constants/config"; // ✅ Import correcto
+import { WebView } from "react-native-webview";
+import { API_ORIGIN } from "../constants/config";
 
 export type Post = {
   id: number;
@@ -34,7 +35,7 @@ export default function PostCard({
 }) {
   const body = item.content ?? item.body ?? "";
 
-  // ✅ Corrección: aseguramos que nunca se use 127.0.0.1 o localhost
+  // ✅ Normalizamos la URL de la imagen
   const imageUrl = (() => {
     if (item.image_url) {
       let url = item.image_url;
@@ -53,9 +54,15 @@ export default function PostCard({
     return null;
   })();
 
+  // ✅ Si no hay imagen, pero sí coordenadas, generamos un mapa embebido
+  const mapUrl =
+    !imageUrl && item.latitude && item.longitude
+      ? `https://maps.google.com/maps?q=${item.latitude},${item.longitude}&z=15&output=embed`
+      : null;
+
   return (
     <Pressable onPress={onPress} style={styles.card} accessibilityRole="button">
-      {imageUrl && (
+      {imageUrl ? (
         <Image
           source={{ uri: imageUrl }}
           style={styles.image}
@@ -64,6 +71,19 @@ export default function PostCard({
             console.log("Error al cargar la imagen:", e.nativeEvent.error)
           }
         />
+      ) : mapUrl ? (
+        <View style={styles.image}>
+          <WebView
+            style={{ flex: 1, borderRadius: 10 }}
+            source={{ uri: mapUrl }}
+            javaScriptEnabled
+            scrollEnabled={false}
+          />
+        </View>
+      ) : (
+        <View style={[styles.image, { alignItems: "center", justifyContent: "center" }]}>
+          <Text style={{ color: "#888" }}>Sin imagen ni ubicación</Text>
+        </View>
       )}
 
       <Text style={styles.title}>{item.title}</Text>
@@ -110,6 +130,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     backgroundColor: "#2a2a2a",
+    overflow: "hidden",
   },
   title: {
     fontSize: 16,

@@ -1,10 +1,12 @@
 import React from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { useRouter, usePathname } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function BottomNavBar() {
   const router = useRouter();
   const pathname = usePathname();
+  const insets = useSafeAreaInsets();
 
   const tabs = [
     {name: "Mapa", route: "/map" },
@@ -14,7 +16,14 @@ export default function BottomNavBar() {
   ];
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingBottom: 12 + insets.bottom,
+        },
+      ]}
+    >
       {tabs.map((tab) => {
         const isActive = pathname === tab.route;
         return (
@@ -41,7 +50,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1e1e1e", 
     borderTopWidth: 1,
     borderColor: "#2e2e2e",
-    paddingVertical: 12,
+    paddingTop: 12,
     position: "absolute",
     bottom: 0,
     left: 0,

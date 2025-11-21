@@ -1,6 +1,6 @@
 import { Platform } from "react-native";
 
-const LOCAL_IP = "192.168.1.47"; // 👈 tu IP de Laravel local
+const LOCAL_IP = "192.168.1.4"; // 👈 tu IP de Laravel local
 
 // Fallbacks locales o por entorno
 const WEB_BASE =

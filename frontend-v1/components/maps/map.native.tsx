@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ActivityIndicator, Alert, Platform } from "react-native";
+import { View, StyleSheet, ActivityIndicator, Alert } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import NavBar from "../NavBar";
 import * as Location from "expo-location";
@@ -13,21 +13,23 @@ export default function MapNative() {
   useEffect(() => {
     (async () => {
       try {
-        // Solicitar permisos de ubicación
         const { status } = await Location.requestForegroundPermissionsAsync();
+        console.log("[MAP] permiso ubicación:", status);
+
         if (status !== "granted") {
           Alert.alert("Error", "Permiso de ubicación denegado.");
-          setRegion({
+          const fallbackRegion = {
             latitude: -34.6037,
             longitude: -58.3816,
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
-          });
+          };
+          console.log("[MAP] usando región fallback:", fallbackRegion);
+          setRegion(fallbackRegion);
           setLoading(false);
           return;
         }
 
-        // Ubicación actual
         const location = await Location.getCurrentPositionAsync({});
         const userRegion = {
           latitude: location.coords.latitude,
@@ -36,11 +38,22 @@ export default function MapNative() {
           longitudeDelta: 0.05,
         };
 
+        console.log("[MAP] región usuario:", userRegion);
         setRegion(userRegion);
 
-        // Cargar marcadores desde tu API
-        const res = await fetch(apiPath("/markers"));
+        const url = apiPath("/markers");
+        console.log("[MAP] fetch markers:", url);
+        const res = await fetch(url);
+
+        console.log("[MAP] res.status markers:", res.status);
+        if (!res.ok) {
+          const txt = await res.text();
+          console.log("[MAP] ERROR BODY markers:", txt);
+          throw new Error(`Error HTTP ${res.status}`);
+        }
+
         const data = await res.json();
+        console.log("[MAP] raw markers:", data);
 
         const cleanData = data
           .filter((m: any) => m.latitude && m.longitude)
@@ -50,9 +63,10 @@ export default function MapNative() {
             longitude: Number(m.longitude),
           }));
 
+        console.log("[MAP] clean markers:", cleanData);
         setMarkers(cleanData);
       } catch (err) {
-        console.log("[MAP ERROR]", err);
+        console.log("[MAP ERROR JS]", err);
         Alert.alert("Error", "No se pudo obtener la ubicación o los datos.");
       } finally {
         setLoading(false);
@@ -71,12 +85,19 @@ export default function MapNative() {
   return (
     <View style={styles.container}>
       <MapView
-        provider={PROVIDER_GOOGLE}
-        style={styles.map}
-        region={region}
-        showsUserLocation={true}
-        showsMyLocationButton={true}
-      >
+  provider={PROVIDER_GOOGLE}
+  style={styles.map}
+  region={region}
+  showsUserLocation={true}
+  showsMyLocationButton={true}
+  onMapReady={() => {
+    console.log("[MAP] onMapReady. Region actual:", region);
+  }}
+  onRegionChangeComplete={(r) => {
+    console.log("[MAP] onRegionChangeComplete:", r);
+  }}
+>
+
         {markers.map((m) => (
           <Marker
             key={m.id}
@@ -90,16 +111,14 @@ export default function MapNative() {
         ))}
       </MapView>
 
-     <NavBar />
+      <NavBar />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1,  backgroundColor: "#fff" },
-  map: { flex: 1,
-    backgroundColor: "#fff"
-   },
+  container: { flex: 1, backgroundColor: "#fff" },
+  map: { flex: 1, backgroundColor: "#fff" },
   loading: {
     flex: 1,
     alignItems: "center",
